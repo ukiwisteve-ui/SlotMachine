@@ -658,6 +658,7 @@ html.force-land .bottom button { flex: none; padding: 5px 4px; font-size: 11px; 
     <div class="row"><label for="setVib">Vibration<small>Works in the Android app</small></label><span class="switch"><input type="checkbox" id="setVib"><span></span></span></div>
     <h3>Humour</h3>
     <div class="row"><label for="setQuips">Character quips</label><span class="switch"><input type="checkbox" id="setQuips"><span></span></span></div>
+    <div class="row"><label for="setVoices">Character voices<small>Quips are spoken out loud</small></label><span class="switch"><input type="checkbox" id="setVoices"><span></span></span></div>
     <div class="row">
       <label id="humourLbl">Swearing<small>Bleeped hides rude words</small></label>
       <div class="seg" role="group" aria-labelledby="humourLbl">
@@ -750,7 +751,7 @@ function freshState() {
     lastDaily: null, streak: 0, nextTopUp: Date.now() + TOPUP_MS, rescueDay: null,
     free: { remaining: 0, lineBet: 0, won: 0, total: 0 },
     stats: { spins: 0, biggest: 0, losses: 0 },
-    settings: { sfx: true, sfxVol: 70, music: true, musicVol: 35, vib: true, quips: true, uncensored: false, fast: false, skip: false, remind: 0 }
+    settings: { sfx: true, sfxVol: 70, music: true, musicVol: 35, vib: true, quips: true, voices: true, uncensored: false, fast: false, skip: false, remind: 0 }
   };
 }
 var state = freshState();
@@ -921,6 +922,21 @@ var QUIPS = {
   jackpot: [['VEX', 'JACKPOT! I\'m buying a new garage. And a better nephew.'], ['DEX', 'Oh {fuck}. Oh {fuck}! We\'re RICH!'], ['GLORP', 'Glorp has never seen so many shinies. Glorp is crying.']],
   freeEnd: [['VEX', 'And we\'re back. Nobody touch the cat. It has too many legs now.'], ['DEX', 'We made it back! I think I left a shoe in that dimension.']]
 };
+// Voice files: numbered per character in QUIPS order (vex_01, vex_02 ...), with a "b" take for bleeped lines.
+(function () { var n = {}; Object.keys(QUIPS).forEach(function (k) { QUIPS[k].forEach(function (q) { n[q[0]] = (n[q[0]] || 0) + 1; q[2] = q[0].toLowerCase() + '_' + (n[q[0]] < 10 ? '0' : '') + n[q[0]]; }); }); })();
+var voiceCache = {}, voiceNow = null;
+function speak(q) {
+  if (!AC || !state.settings.sfx || state.settings.voices === false) return false;
+  var name = q[2] + (/\{/.test(q[1]) && !state.settings.uncensored ? 'b' : '');
+  var p = voiceCache[name] || (voiceCache[name] = fetch('vo/' + name + '.mp3').then(function (r) { if (!r.ok) throw 0; return r.arrayBuffer(); })
+    .then(function (b) { return new Promise(function (ok, bad) { AC.decodeAudioData(b, ok, bad); }); }));
+  p.then(function (buf) {
+    if (voiceNow) try { voiceNow.stop(); } catch (e) {}
+    var src = AC.createBufferSource(), g = AC.createGain(); src.buffer = buf; g.gain.value = 1.1;
+    src.connect(g); g.connect(sfxGain); src.start(); voiceNow = src;
+  }).catch(function () { delete voiceCache[name]; });
+  return true;
+}
 var lastQuip = 0;
 function renderQuip(text) {
   var html = '', bleeped = false;
@@ -945,7 +961,7 @@ function say(kind, force) {
   $('quipText').innerHTML = '<span class="who">' + CAST[q[0]] + ':</span>' + r.html;
   var box = $('quip'); box.classList.remove('fresh'); void box.offsetWidth; box.classList.add('fresh');
   lastQuip = now;
-  if (r.bleeped) SFX.bleep(); else SFX.blip();
+  if (!speak(q)) { if (r.bleeped) SFX.bleep(); else SFX.blip(); }
 }
 
 /* ---------- Reels ---------- */
@@ -1494,7 +1510,7 @@ function syncSettingsUI() {
   var s = state.settings;
   $('setSfx').checked = s.sfx; $('setSfxVol').value = s.sfxVol;
   $('setMusic').checked = s.music; $('setMusicVol').value = s.musicVol;
-  $('setVib').checked = s.vib; $('setQuips').checked = s.quips;
+  $('setVib').checked = s.vib; $('setQuips').checked = s.quips; $('setVoices').checked = s.voices !== false;
   $('humBleep').setAttribute('aria-pressed', String(!s.uncensored));
   $('humFull').setAttribute('aria-pressed', String(s.uncensored));
   $('setFast').checked = s.fast; $('setSkip').checked = s.skip; $('setRemind').value = String(s.remind);
@@ -1510,7 +1526,7 @@ function bindSetting(id, key, prop) {
 }
 bindSetting('setSfx', 'sfx'); bindSetting('setSfxVol', 'sfxVol', 'value');
 bindSetting('setMusic', 'music'); bindSetting('setMusicVol', 'musicVol', 'value');
-bindSetting('setVib', 'vib'); bindSetting('setQuips', 'quips');
+bindSetting('setVib', 'vib'); bindSetting('setQuips', 'quips'); bindSetting('setVoices', 'voices');
 bindSetting('setFast', 'fast'); bindSetting('setSkip', 'skip');
 $('setRemind').addEventListener('change', function () { state.settings.remind = +this.value; playStart = Date.now(); save(); });
 $('humBleep').addEventListener('click', function () { state.settings.uncensored = false; syncSettingsUI(); save(); SFX.bleep(); });

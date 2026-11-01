@@ -1,0 +1,239 @@
+[
+ {
+  "file": "vex_01",
+  "char": "VEX",
+  "kind": "hello",
+  "text": "Welcome to the garage. Touch nothing. Except the spin button. Spin that."
+ },
+ {
+  "file": "dex_01",
+  "char": "DEX",
+  "kind": "hello",
+  "text": "Uncle Vex says this machine is \"mostly\" safe. That's good, right?"
+ },
+ {
+  "file": "vex_02",
+  "char": "VEX",
+  "kind": "win",
+  "text": "Hah! Even a {damn} space monkey could hit that.",
+  "bleep": true
+ },
+ {
+  "file": "dex_02",
+  "char": "DEX",
+  "kind": "win",
+  "text": "Oh geez, we actually won something!"
+ },
+ {
+  "file": "glorp_01",
+  "char": "GLORP",
+  "kind": "win",
+  "text": "Glorp eat coins? No? Okay. You keep."
+ },
+ {
+  "file": "b12_01",
+  "char": "B12",
+  "kind": "win",
+  "text": "Congratulations. I am contractually obliged to say that."
+ },
+ {
+  "file": "fizz_01",
+  "char": "FIZZ",
+  "kind": "win",
+  "text": "That win must be declared on form 77-B."
+ },
+ {
+  "file": "vex_03",
+  "char": "VEX",
+  "kind": "win",
+  "text": "See? Science. Mostly luck, but science."
+ },
+ {
+  "file": "vex_04",
+  "char": "VEX",
+  "kind": "big",
+  "text": "Holy {shit}! The multiverse just paid up!",
+  "bleep": true
+ },
+ {
+  "file": "dex_03",
+  "char": "DEX",
+  "kind": "big",
+  "text": "Oh {crap}, oh {crap}, that's a LOT of coins!",
+  "bleep": true
+ },
+ {
+  "file": "vex_05",
+  "char": "VEX",
+  "kind": "big",
+  "text": "Oh {fuck} yes! That's jackpot energy, baby!",
+  "bleep": true
+ },
+ {
+  "file": "b12_02",
+  "char": "B12",
+  "kind": "big",
+  "text": "Wealth detected. Recalculating my opinion of you."
+ },
+ {
+  "file": "glorp_02",
+  "char": "GLORP",
+  "kind": "big",
+  "text": "SHINY! Glorp so happy Glorp might split in two."
+ },
+ {
+  "file": "vex_06",
+  "char": "VEX",
+  "kind": "loss",
+  "text": "Another universe where you're broke. Classic."
+ },
+ {
+  "file": "b12_03",
+  "char": "B12",
+  "kind": "loss",
+  "text": "Statistically this is fine. Emotionally it is {shit}.",
+  "bleep": true
+ },
+ {
+  "file": "fizz_02",
+  "char": "FIZZ",
+  "kind": "loss",
+  "text": "Your losses have been filed. In triplicate."
+ },
+ {
+  "file": "dex_04",
+  "char": "DEX",
+  "kind": "loss",
+  "text": "Maybe the next one? Please be the next one."
+ },
+ {
+  "file": "vex_07",
+  "char": "VEX",
+  "kind": "loss",
+  "text": "Spin it again. What's the worst that could happen? Don't answer that."
+ },
+ {
+  "file": "glorp_03",
+  "char": "GLORP",
+  "kind": "loss",
+  "text": "Glorp eat the bad luck. Glorp hungry anyway."
+ },
+ {
+  "file": "vex_08",
+  "char": "VEX",
+  "kind": "near",
+  "text": "Two cores. TWO. Son of a {bitch}.",
+  "bleep": true
+ },
+ {
+  "file": "dex_05",
+  "char": "DEX",
+  "kind": "near",
+  "text": "It was SO close! Why does the universe hate us?"
+ },
+ {
+  "file": "fizz_03",
+  "char": "FIZZ",
+  "kind": "near",
+  "text": "Near-miss noted. Hope is not a refundable expense."
+ },
+ {
+  "file": "vex_09",
+  "char": "VEX",
+  "kind": "bonus",
+  "text": "The cores are overloading! Grab something, we're jumping!"
+ },
+ {
+  "file": "dex_06",
+  "char": "DEX",
+  "kind": "bonus",
+  "text": "Not the rift! Not the {damn} rift again!",
+  "bleep": true
+ },
+ {
+  "file": "collector_01",
+  "char": "COLLECTOR",
+  "kind": "collector",
+  "text": "Splendid reel. I shall add it to my collection."
+ },
+ {
+  "file": "collector_02",
+  "char": "COLLECTOR",
+  "kind": "collector",
+  "text": "Do not mind me. Just borrowing reality for a moment."
+ },
+ {
+  "file": "collector_03",
+  "char": "COLLECTOR",
+  "kind": "collector",
+  "text": "Ooh, a rare one. Wrap it up, darling."
+ },
+ {
+  "file": "vex_10",
+  "char": "VEX",
+  "kind": "broke",
+  "text": "You're out of coins, genius. Here's a handout. Don't make it weird."
+ },
+ {
+  "file": "b12_04",
+  "char": "B12",
+  "kind": "level",
+  "text": "Level up. Your parents would be mildly impressed."
+ },
+ {
+  "file": "vex_11",
+  "char": "VEX",
+  "kind": "level",
+  "text": "New level. Bigger bets. Worse decisions. I love it."
+ },
+ {
+  "file": "fizz_04",
+  "char": "FIZZ",
+  "kind": "lockdown",
+  "text": "Containment breach! Everyone remain calm and complete form 9."
+ },
+ {
+  "file": "vex_12",
+  "char": "VEX",
+  "kind": "lockdown",
+  "text": "The orbs are loose! Grab them before they eat the {damn} house.",
+  "bleep": true
+ },
+ {
+  "file": "dex_07",
+  "char": "DEX",
+  "kind": "lockdown",
+  "text": "Why is it beeping? Uncle Vex, why is it BEEPING?"
+ },
+ {
+  "file": "vex_13",
+  "char": "VEX",
+  "kind": "jackpot",
+  "text": "JACKPOT! I'm buying a new garage. And a better nephew."
+ },
+ {
+  "file": "dex_08",
+  "char": "DEX",
+  "kind": "jackpot",
+  "text": "Oh {fuck}. Oh {fuck}! We're RICH!",
+  "bleep": true
+ },
+ {
+  "file": "glorp_04",
+  "char": "GLORP",
+  "kind": "jackpot",
+  "text": "Glorp has never seen so many shinies. Glorp is crying."
+ },
+ {
+  "file": "vex_14",
+  "char": "VEX",
+  "kind": "freeEnd",
+  "text": "And we're back. Nobody touch the cat. It has too many legs now."
+ },
+ {
+  "file": "dex_09",
+  "char": "DEX",
+  "kind": "freeEnd",
+  "text": "We made it back! I think I left a shoe in that dimension."
+ }
+]
