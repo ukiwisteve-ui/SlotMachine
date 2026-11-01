@@ -461,8 +461,14 @@ select { background: var(--panel); color: var(--ink); border: 2px solid var(--li
 }
 /* Landscape phones: the reels fill the middle at full height; everything else sits in slim side columns */
 @media (orientation: landscape) and (max-height: 560px) {
-  .app { max-width: none; display: grid; grid-template-columns: clamp(128px, 17vw, 190px) minmax(0, 1fr) clamp(128px, 17vw, 190px); grid-template-rows: auto auto auto minmax(0, 1fr); grid-template-areas: "coins reels icons" "mq reels meter" "jp reels ctrl" "quip reels bottom"; gap: 8px 12px; padding-block: 6px; padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
+  .app { max-width: none; display: grid; grid-template-columns: clamp(128px, 17vw, 190px) minmax(0, 1fr) clamp(128px, 17vw, 190px); grid-template-rows: auto auto minmax(0, 1fr) auto; grid-template-areas: "coins reels icons" "mq reels meter" "jp reels ctrl" "quip reels bottom"; gap: 8px 18px; position: relative; isolation: isolate; padding-block: 6px; padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
   .topbar, .cabinet { display: contents; }
+  .app::before, .app::after { content: ""; grid-row: 1 / -1; margin: -6px -8px; z-index: -1; border-radius: 18px;
+    background: radial-gradient(120% 40% at 50% 0%, #4a2380 0%, transparent 70%), linear-gradient(180deg, #1d0b38f2, #0b0418f2);
+    box-shadow: 0 0 0 2px #000, 0 0 0 4px #b97a00, 0 0 0 5px #ffe27a, 0 0 0 7px #000, 0 10px 30px #000c, inset 0 0 30px #000a; }
+  .app::before { grid-column: 1; } .app::after { grid-column: 3; }
+  body.free .app::before, body.free .app::after { background: radial-gradient(120% 40% at 50% 0%, #0b6b6baa 0%, transparent 70%), linear-gradient(180deg, #05333df2, #120526f2); }
+  body.lock .app::before, body.lock .app::after { box-shadow: 0 0 0 2px #000, 0 0 0 6px #ffcc33, 0 0 0 8px #000, 0 10px 30px #000c; }
   .coins { grid-area: coins; min-width: 0; padding-block: 4px; }
   .coins b { font-size: clamp(12px, 1.8vw, 15px); }
   .coins .coin-ico { display: none; }
@@ -471,28 +477,28 @@ select { background: var(--panel); color: var(--ink); border: 2px solid var(--li
   #openPay { grid-area: icons; justify-self: start; margin-left: 4px; }
   #openSettings { grid-area: icons; justify-self: end; margin-right: 4px; }
   .iconbtn { width: 36px; height: 36px; }
-  .marquee { grid-area: mq; padding: 2px 4px; gap: 2px; grid-template-columns: 1fr; align-self: start; }
+  .marquee { grid-area: mq; padding: 2px 4px; gap: 2px; grid-template-columns: 1fr; align-self: center; }
   .marquee .mascot { display: none; }
   .marquee::after { width: 120px; height: 120px; margin: -60px 0 0 -60px; }
-  .logo img { height: min(84px, 20dvh); margin: -4px auto -6px; }
+  .logo img { height: min(104px, 24dvh); margin: -6px auto -8px; }
   .fs-banner { font-size: 10px; padding: 2px 6px; white-space: nowrap; }
   .jackpots { grid-area: jp; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; align-self: center; align-items: start; }
   .jp { padding: 4px 2px; }
   .jp span { font-size: 9px; } .jp b { font-size: 12px; }
-  .quip { grid-area: quip; align-self: start; min-height: 0; gap: 4px; }
+  .quip { grid-area: quip; align-self: end; min-height: 0; gap: 4px; }
   .quip .face { width: 30px; height: 30px; }
   .bubble { font-size: 11px; padding: 0 8px; border-top: 4px solid #fff; border-bottom: 4px solid #e9e2ff; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden; line-height: 1.3; }
   .bubble::before { display: none; }
   .reelwrap { grid-area: reels; width: min(100%, calc((100dvh - 26px) * 1.66)); justify-self: center; align-self: center; }
-  .meter { grid-area: meter; flex-direction: column; gap: 6px; align-self: start; }
-  .meter > div { padding: 1px 6px; }
-  .meter label { font-size: 10px; } .meter output { font-size: 16px; }
+  .meter { grid-area: meter; flex-direction: row; gap: 5px; align-self: center; }
+  .meter > div { padding: 2px 3px; }
+  .meter label { font-size: 8px; letter-spacing: .06em; white-space: nowrap; } .meter output { font-size: 14px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .controls { grid-area: ctrl; grid-template-columns: 1fr; grid-template-areas: "spin" "bet" "side"; justify-items: center; align-items: center; gap: 6px; }
   .controls .spin { grid-area: spin; width: min(76px, 18dvh); height: min(76px, 18dvh); font-size: 16px; margin: 0 0 12px; }
   .controls .bet { grid-area: bet; gap: 2px; }
   .controls .bet .betval { min-width: 34px; } .controls .bet .betval span { display: none; }
   .bet button { width: 28px; height: 28px; font-size: 15px; }
-  .controls .side { grid-area: side; }
+  .controls .side { grid-area: side; justify-self: center; }
   .controls .pill { padding: 4px 12px; font-size: 12px; }
   .bottom { grid-area: bottom; flex-direction: column; align-self: end; gap: 6px; }
   .bottom button { flex: none; padding: 5px 4px; font-size: 11px; }
@@ -504,8 +510,15 @@ html.force-land body { position: absolute; top: 0; left: 0; width: var(--lw); he
 html.force-land.desk { --lw: 880px; --lh: 400px; background: #05010c; }
 html.force-land.desk body { top: 50%; left: 50%; transform-origin: center; transform: translate(-50%, -50%) scale(var(--fit, 1)); border-radius: 26px; box-shadow: 0 0 0 10px #111, 0 0 0 12px #333, 0 20px 60px #000; }
 html.force-land .rotate-hint { display: none !important; }
-html.force-land .app { max-width: none; display: grid; grid-template-columns: clamp(128px, calc(var(--lw) * 17 / 100), 190px) minmax(0, 1fr) clamp(128px, calc(var(--lw) * 17 / 100), 190px); grid-template-rows: auto auto auto minmax(0, 1fr); grid-template-areas: "coins reels icons" "mq reels meter" "jp reels ctrl" "quip reels bottom"; gap: 8px 12px; padding-block: 6px; padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
+html.force-land .app { max-width: none; display: grid; grid-template-columns: clamp(128px, calc(var(--lw) * 17 / 100), 190px) minmax(0, 1fr) clamp(128px, calc(var(--lw) * 17 / 100), 190px); grid-template-rows: auto auto minmax(0, 1fr) auto; grid-template-areas: "coins reels icons" "mq reels meter" "jp reels ctrl" "quip reels bottom"; gap: 8px 18px; position: relative; isolation: isolate; padding-block: 6px; padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
 html.force-land .topbar, html.force-land .cabinet { display: contents; }
+html.force-land .app::before, html.force-land .app::after { content: ""; grid-row: 1 / -1; margin: -6px -8px; z-index: -1; border-radius: 18px;
+    background: radial-gradient(120% 40% at 50% 0%, #4a2380 0%, transparent 70%), linear-gradient(180deg, #1d0b38f2, #0b0418f2);
+    box-shadow: 0 0 0 2px #000, 0 0 0 4px #b97a00, 0 0 0 5px #ffe27a, 0 0 0 7px #000, 0 10px 30px #000c, inset 0 0 30px #000a; }
+html.force-land .app::before { grid-column: 1; }
+html.force-land .app::after { grid-column: 3; }
+html.force-land body.free .app::before, html.force-land body.free .app::after { background: radial-gradient(120% 40% at 50% 0%, #0b6b6baa 0%, transparent 70%), linear-gradient(180deg, #05333df2, #120526f2); }
+html.force-land body.lock .app::before, html.force-land body.lock .app::after { box-shadow: 0 0 0 2px #000, 0 0 0 6px #ffcc33, 0 0 0 8px #000, 0 10px 30px #000c; }
 html.force-land .coins { grid-area: coins; min-width: 0; padding-block: 4px; }
 html.force-land .coins b { font-size: clamp(12px, calc(var(--lw) * 1.8 / 100), 15px); }
 html.force-land .coins .coin-ico { display: none; }
@@ -514,35 +527,39 @@ html.force-land .topbar .level { display: none; }
 html.force-land #openPay { grid-area: icons; justify-self: start; margin-left: 4px; }
 html.force-land #openSettings { grid-area: icons; justify-self: end; margin-right: 4px; }
 html.force-land .iconbtn { width: 36px; height: 36px; }
-html.force-land .marquee { grid-area: mq; padding: 2px 4px; gap: 2px; grid-template-columns: 1fr; align-self: start; }
+html.force-land .marquee { grid-area: mq; padding: 2px 4px; gap: 2px; grid-template-columns: 1fr; align-self: center; }
 html.force-land .marquee .mascot { display: none; }
 html.force-land .marquee::after { width: 120px; height: 120px; margin: -60px 0 0 -60px; }
-html.force-land .logo img { height: min(84px, calc(var(--lh) * 20 / 100)); margin: -4px auto -6px; }
+html.force-land .logo img { height: min(104px, calc(var(--lh) * 24 / 100)); margin: -6px auto -8px; }
 html.force-land .fs-banner { font-size: 10px; padding: 2px 6px; white-space: nowrap; }
 html.force-land .jackpots { grid-area: jp; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; align-self: center; align-items: start; }
 html.force-land .jp { padding: 4px 2px; }
 html.force-land .jp span { font-size: 9px; }
 html.force-land .jp b { font-size: 12px; }
-html.force-land .quip { grid-area: quip; align-self: start; min-height: 0; gap: 4px; }
+html.force-land .quip { grid-area: quip; align-self: end; min-height: 0; gap: 4px; }
 html.force-land .quip .face { width: 30px; height: 30px; }
 html.force-land .bubble { font-size: 11px; padding: 0 8px; border-top: 4px solid #fff; border-bottom: 4px solid #e9e2ff; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden; line-height: 1.3; }
 html.force-land .bubble::before { display: none; }
 html.force-land .reelwrap { grid-area: reels; width: min(100%, calc((calc(var(--lh) * 100 / 100) - 26px) * 1.66)); justify-self: center; align-self: center; }
-html.force-land .meter { grid-area: meter; flex-direction: column; gap: 6px; align-self: start; }
-html.force-land .meter > div { padding: 1px 6px; }
-html.force-land .meter label { font-size: 10px; }
-html.force-land .meter output { font-size: 16px; }
+html.force-land .meter { grid-area: meter; flex-direction: row; gap: 5px; align-self: center; }
+html.force-land .meter > div { padding: 2px 3px; }
+html.force-land .meter label { font-size: 8px; letter-spacing: .06em; white-space: nowrap; }
+html.force-land .meter output { font-size: 14px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 html.force-land .controls { grid-area: ctrl; grid-template-columns: 1fr; grid-template-areas: "spin" "bet" "side"; justify-items: center; align-items: center; gap: 6px; }
 html.force-land .controls .spin { grid-area: spin; width: min(76px, calc(var(--lh) * 18 / 100)); height: min(76px, calc(var(--lh) * 18 / 100)); font-size: 16px; margin: 0 0 12px; }
 html.force-land .controls .bet { grid-area: bet; gap: 2px; }
 html.force-land .controls .bet .betval { min-width: 34px; }
 html.force-land .controls .bet .betval span { display: none; }
 html.force-land .bet button { width: 28px; height: 28px; font-size: 15px; }
-html.force-land .controls .side { grid-area: side; }
+html.force-land .controls .side { grid-area: side; justify-self: center; }
 html.force-land .controls .pill { padding: 4px 12px; font-size: 12px; }
 html.force-land .bottom { grid-area: bottom; flex-direction: column; align-self: end; gap: 6px; }
 html.force-land .bottom button { flex: none; padding: 5px 4px; font-size: 11px; }
 /* end landscape preview */
+
+
+
+
 
 
 
