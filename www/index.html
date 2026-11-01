@@ -721,7 +721,7 @@ var SFX = {
   coin: function () { tone(1800, 0.06, 'sine', 0.12); tone(2400, 0.08, 'sine', 0.1, 0.05); }
 };
 // Recorded sound effects. Each one replaces its synth version once it has loaded; until then (or if loading fails) the synth plays.
-var SAMPLE_GAIN = { click: 0.45, spin: 0.7, stop: 0.55, win: 0.8, big: 0.9, count: 0.3, core: 0.9, tease: 0.8, bonus: 0.9 };
+var SAMPLE_GAIN = { click: 0.45, spin: 0.7, stop: 0.2, win: 0.8, big: 0.9, count: 0.3, core: 0.9, tease: 0.8, bonus: 0.9 };
 var samples = {}; window.RR_samples = samples;
 function loadSamples() {
   Object.keys(SAMPLE_GAIN).forEach(function (name) {

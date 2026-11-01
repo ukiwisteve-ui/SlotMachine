@@ -11,7 +11,7 @@ enc() { # name start_seconds max_seconds
 }
 enc click 0 0.5
 enc spin 0 1.9
-enc stop 0.27 0.8
+enc stop 0.27 0.4
 enc win 0 1.0
 enc big 0.42 5.6
 enc count 0 4.0
