@@ -456,58 +456,89 @@ select { background: var(--panel); color: var(--ink); border: 2px solid var(--li
   .spin { width: 76px; height: 76px; font-size: 18px; }
   .bubble { font-size: 13px; padding: 5px 9px; }
 }
-/* Landscape phones: reels in the middle, logo and jackpots left, meters and spin right */
+/* Landscape phones: the reels fill the middle at full height; everything else sits in slim side columns */
 @media (orientation: landscape) and (max-height: 560px) {
-  .app { max-width: none; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto minmax(0, 1fr); gap: 8px 10px; padding-block: 6px; padding-left: max(10px, env(safe-area-inset-left, 0px)); padding-right: max(10px, env(safe-area-inset-right, 0px)); }
-  .topbar { grid-column: 1; grid-row: 1; }
-  .coins { max-width: 260px; }
-  .bottom { grid-column: 2; grid-row: 1; align-self: center; }
-  .bottom button { flex: none; padding: 6px 12px; font-size: 12px; }
-  .cabinet { grid-column: 1 / -1; grid-row: 2; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr); grid-template-areas: "mq reels meter" "jp reels ctrl" "quip reels ctrl"; align-items: center; justify-items: stretch; gap: 8px 14px; padding: 10px 14px; }
-  .marquee { grid-area: mq; padding: 4px 6px; gap: 4px; }
-  .marquee::after { width: 140px; height: 140px; margin: -70px 0 0 -70px; }
-  .logo img { height: min(96px, 22dvh); margin: -6px auto -8px; }
-  .mascot { width: min(34px, 8dvh); }
-  .fs-banner { font-size: 11px; padding: 2px 8px; white-space: nowrap; }
+  .app { max-width: none; display: grid; grid-template-columns: clamp(128px, 17vw, 190px) minmax(0, 1fr) clamp(128px, 17vw, 190px); grid-template-rows: auto auto auto minmax(0, 1fr); grid-template-areas: "coins reels icons" "mq reels meter" "jp reels ctrl" "quip reels bottom"; gap: 8px 12px; padding-block: 6px; padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
+  .topbar, .cabinet { display: contents; }
+  .coins { grid-area: coins; min-width: 0; padding-block: 4px; }
+  .coins b { font-size: clamp(12px, 1.8vw, 15px); }
+  .coins .coin-ico { display: none; }
+  .coins .plus { width: 24px; height: 24px; font-size: 15px; }
+  .topbar .level { display: none; }
+  #openPay { grid-area: icons; justify-self: start; margin-left: 4px; }
+  #openSettings { grid-area: icons; justify-self: end; margin-right: 4px; }
+  .iconbtn { width: 36px; height: 36px; }
+  .marquee { grid-area: mq; padding: 2px 4px; gap: 2px; grid-template-columns: 1fr; }
+  .marquee .mascot { display: none; }
+  .marquee::after { width: 120px; height: 120px; margin: -60px 0 0 -60px; }
+  .logo img { height: min(84px, 20dvh); margin: -4px auto -6px; }
+  .fs-banner { font-size: 10px; padding: 2px 6px; white-space: nowrap; }
   .jackpots { grid-area: jp; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
-  .quip { grid-area: quip; align-self: start; min-height: 0; }
-  .quip .face { width: 34px; height: 34px; }
-  .bubble { font-size: 12px; padding: 5px 9px; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; line-height: 1.3; max-height: calc(3.9em + 10px); box-sizing: border-box; }
-  .reelwrap { grid-area: reels; width: min(calc((100dvh - 92px) * 1.62), 50vw); align-self: center; }
+  .jp span { font-size: 9px; } .jp b { font-size: 12px; }
+  .quip { grid-area: quip; align-self: start; min-height: 0; gap: 4px; }
+  .quip .face { width: 30px; height: 30px; }
+  .bubble { font-size: 11px; padding: 0 8px; border-top: 4px solid #fff; border-bottom: 4px solid #e9e2ff; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden; line-height: 1.3; }
+  .bubble::before { display: none; }
+  .reelwrap { grid-area: reels; width: min(100%, calc((100dvh - 26px) * 1.66)); justify-self: center; align-self: center; }
   .meter { grid-area: meter; flex-direction: column; gap: 6px; }
-  .controls { grid-area: ctrl; grid-template-columns: 1fr; grid-template-areas: "spin" "bet" "side"; justify-items: center; gap: 12px 8px; align-self: center; }
-  .controls .pill { padding-block: 6px; }
-  .controls .spin { grid-area: spin; width: min(88px, 21dvh); height: min(88px, 21dvh); font-size: 17px; }
-  .bet button { width: 32px; height: 32px; }
-  .controls .bet { grid-area: bet; justify-self: center; }
-  .controls .side { grid-area: side; justify-self: center; }
+  .meter > div { padding: 1px 6px; }
+  .meter label { font-size: 10px; } .meter output { font-size: 16px; }
+  .controls { grid-area: ctrl; grid-template-columns: 1fr; grid-template-areas: "spin" "bet" "side"; justify-items: center; align-items: center; gap: 6px; }
+  .controls .spin { grid-area: spin; width: min(80px, 19dvh); height: min(80px, 19dvh); font-size: 16px; }
+  .controls .bet { grid-area: bet; gap: 2px; }
+  .controls .bet .betval { min-width: 34px; } .controls .bet .betval span { display: none; }
+  .bet button { width: 28px; height: 28px; font-size: 15px; }
+  .controls .side { grid-area: side; }
+  .controls .pill { padding: 4px 12px; font-size: 12px; }
+  .bottom { grid-area: bottom; flex-direction: column; align-self: end; gap: 6px; }
+  .bottom button { flex: none; padding: 5px 4px; font-size: 11px; }
 }
-/* Landscape preview (Settings > Test features): turns the whole game sideways on a portrait screen */
-html.force-land body { position: absolute; top: 0; left: 0; width: 100vh; height: 100vw; transform-origin: top left; transform: rotate(90deg) translateY(-100%); }
+/* Landscape preview (Settings > Test features). On a portrait phone the game turns sideways;
+   on a computer it shows inside a landscape phone-sized screen. Generated by tools/landscape_preview.py. */
+html.force-land { --lw: 100vh; --lh: 100vw; }
+html.force-land body { position: absolute; top: 0; left: 0; width: var(--lw); height: var(--lh); transform-origin: top left; transform: rotate(90deg) translateY(-100%); }
+html.force-land.desk { --lw: 880px; --lh: 400px; background: #05010c; }
+html.force-land.desk body { top: 50%; left: 50%; transform-origin: center; transform: translate(-50%, -50%) scale(var(--fit, 1)); border-radius: 26px; box-shadow: 0 0 0 10px #111, 0 0 0 12px #333, 0 20px 60px #000; }
 html.force-land .rotate-hint { display: none !important; }
-  html.force-land .app { max-width: none; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto minmax(0, 1fr); gap: 8px 10px; padding-block: 6px; padding-left: max(10px, env(safe-area-inset-left, 0px)); padding-right: max(10px, env(safe-area-inset-right, 0px)); }
-  html.force-land .topbar { grid-column: 1; grid-row: 1; }
-  html.force-land .coins { max-width: 260px; }
-  html.force-land .bottom { grid-column: 2; grid-row: 1; align-self: center; }
-  html.force-land .bottom button { flex: none; padding: 6px 12px; font-size: 12px; }
-  html.force-land .cabinet { grid-column: 1 / -1; grid-row: 2; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr); grid-template-areas: "mq reels meter" "jp reels ctrl" "quip reels ctrl"; align-items: center; justify-items: stretch; gap: 8px 14px; padding: 10px 14px; }
-  html.force-land .marquee { grid-area: mq; padding: 4px 6px; gap: 4px; }
-  html.force-land .marquee::after { width: 140px; height: 140px; margin: -70px 0 0 -70px; }
-  html.force-land .logo img { height: min(96px, 22vw); margin: -6px auto -8px; }
-  html.force-land .mascot { width: min(34px, 8vw); }
-  html.force-land .fs-banner { font-size: 11px; padding: 2px 8px; white-space: nowrap; }
-  html.force-land .jackpots { grid-area: jp; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
-  html.force-land .quip { grid-area: quip; align-self: start; min-height: 0; }
-  html.force-land .quip .face { width: 34px; height: 34px; }
-  html.force-land .bubble { font-size: 12px; padding: 5px 9px; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; line-height: 1.3; max-height: calc(3.9em + 10px); box-sizing: border-box; }
-  html.force-land .reelwrap { grid-area: reels; width: min(calc((100vw - 92px) * 1.62), 50vh); align-self: center; }
-  html.force-land .meter { grid-area: meter; flex-direction: column; gap: 6px; }
-  html.force-land .controls { grid-area: ctrl; grid-template-columns: 1fr; grid-template-areas: "spin" "bet" "side"; justify-items: center; gap: 12px 8px; align-self: center; }
-  html.force-land .controls .pill { padding-block: 6px; }
-  html.force-land .controls .spin { grid-area: spin; width: min(88px, 21vw); height: min(88px, 21vw); font-size: 17px; }
-  html.force-land .bet button { width: 32px; height: 32px; }
-  html.force-land .controls .bet { grid-area: bet; justify-self: center; }
-  html.force-land .controls .side { grid-area: side; justify-self: center; }
+html.force-land .app { max-width: none; display: grid; grid-template-columns: clamp(128px, calc(var(--lw) * 17 / 100), 190px) minmax(0, 1fr) clamp(128px, calc(var(--lw) * 17 / 100), 190px); grid-template-rows: auto auto auto minmax(0, 1fr); grid-template-areas: "coins reels icons" "mq reels meter" "jp reels ctrl" "quip reels bottom"; gap: 8px 12px; padding-block: 6px; padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
+html.force-land .topbar, html.force-land .cabinet { display: contents; }
+html.force-land .coins { grid-area: coins; min-width: 0; padding-block: 4px; }
+html.force-land .coins b { font-size: clamp(12px, calc(var(--lw) * 1.8 / 100), 15px); }
+html.force-land .coins .coin-ico { display: none; }
+html.force-land .coins .plus { width: 24px; height: 24px; font-size: 15px; }
+html.force-land .topbar .level { display: none; }
+html.force-land #openPay { grid-area: icons; justify-self: start; margin-left: 4px; }
+html.force-land #openSettings { grid-area: icons; justify-self: end; margin-right: 4px; }
+html.force-land .iconbtn { width: 36px; height: 36px; }
+html.force-land .marquee { grid-area: mq; padding: 2px 4px; gap: 2px; grid-template-columns: 1fr; }
+html.force-land .marquee .mascot { display: none; }
+html.force-land .marquee::after { width: 120px; height: 120px; margin: -60px 0 0 -60px; }
+html.force-land .logo img { height: min(84px, calc(var(--lh) * 20 / 100)); margin: -4px auto -6px; }
+html.force-land .fs-banner { font-size: 10px; padding: 2px 6px; white-space: nowrap; }
+html.force-land .jackpots { grid-area: jp; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+html.force-land .jp span { font-size: 9px; }
+html.force-land .jp b { font-size: 12px; }
+html.force-land .quip { grid-area: quip; align-self: start; min-height: 0; gap: 4px; }
+html.force-land .quip .face { width: 30px; height: 30px; }
+html.force-land .bubble { font-size: 11px; padding: 0 8px; border-top: 4px solid #fff; border-bottom: 4px solid #e9e2ff; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden; line-height: 1.3; }
+html.force-land .bubble::before { display: none; }
+html.force-land .reelwrap { grid-area: reels; width: min(100%, calc((calc(var(--lh) * 100 / 100) - 26px) * 1.66)); justify-self: center; align-self: center; }
+html.force-land .meter { grid-area: meter; flex-direction: column; gap: 6px; }
+html.force-land .meter > div { padding: 1px 6px; }
+html.force-land .meter label { font-size: 10px; }
+html.force-land .meter output { font-size: 16px; }
+html.force-land .controls { grid-area: ctrl; grid-template-columns: 1fr; grid-template-areas: "spin" "bet" "side"; justify-items: center; align-items: center; gap: 6px; }
+html.force-land .controls .spin { grid-area: spin; width: min(80px, calc(var(--lh) * 19 / 100)); height: min(80px, calc(var(--lh) * 19 / 100)); font-size: 16px; }
+html.force-land .controls .bet { grid-area: bet; gap: 2px; }
+html.force-land .controls .bet .betval { min-width: 34px; }
+html.force-land .controls .bet .betval span { display: none; }
+html.force-land .bet button { width: 28px; height: 28px; font-size: 15px; }
+html.force-land .controls .side { grid-area: side; }
+html.force-land .controls .pill { padding: 4px 12px; font-size: 12px; }
+html.force-land .bottom { grid-area: bottom; flex-direction: column; align-self: end; gap: 6px; }
+html.force-land .bottom button { flex: none; padding: 5px 4px; font-size: 11px; }
+/* end landscape preview */
+
 
 @media (prefers-reduced-motion: reduce) {
   .swirl, .bob, .alarm, .lc.roll::after,
@@ -1484,8 +1515,12 @@ $('autoBtn').addEventListener('click', function () {
   if (auto && !spinning && state.free.remaining === 0) doSpin();
 });
 // Landscape: ask the phone to lock sideways on the first tap (works in Chrome on Android and in the app), and hint otherwise.
+function fitPreview() { document.documentElement.style.setProperty('--fit', Math.min((innerWidth - 40) / 880, (innerHeight - 40) / 400, 1.5)); }
+window.addEventListener('resize', fitPreview);
 $('landBtn').addEventListener('click', function () {
-  var on = document.documentElement.classList.toggle('force-land');
+  var root = document.documentElement, on = root.classList.toggle('force-land');
+  root.classList.toggle('desk', on && !matchMedia('(orientation: portrait) and (pointer: coarse)').matches);
+  fitPreview();
   this.setAttribute('aria-pressed', on); this.textContent = on ? 'Back to portrait' : 'Preview landscape';
   closeModal('settingsModal'); setTimeout(sizeReels, 50);
 });
