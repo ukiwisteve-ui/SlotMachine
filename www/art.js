@@ -309,3 +309,55 @@
 
   root.RiftScenes = { garage: garage, rift: rift, lock: lock };
 })(this);
+
+/* Illustrated character art. Where a painted image exists in www/art, it replaces the vector
+   drawing inside the same gold medallion. Add a symbol here once its image is in place. */
+(function (root) {
+  'use strict';
+  var ART = root.RiftArt, K = '#1b0d2e';
+  // [image file, x, y, size] places the artwork inside the 100x100 medallion.
+  var PAINTED = {
+    VEX:   ['art/vex.webp', -2, 3, 104],
+    DEX:   ['art/dex.webp', -2, 4, 104],
+    GLORP: ['art/glorp.webp', 4, 8, 92],
+    B12:   ['art/b12.webp', -2, 4, 104],
+    FIZZ:  ['art/fizz.webp', -2, 2, 104]
+  };
+  var BG = { VEX: 'rrBgVex', DEX: 'rrBgDex', GLORP: 'rrBgGlorp', B12: 'rrBgB12', FIZZ: 'rrBgFizz' };
+  Object.keys(PAINTED).forEach(function (k) {
+    var p = PAINTED[k];
+    ART[k] = '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
+      '<circle cx="50" cy="51.5" r="48" fill="#000" opacity=".35"/>' +
+      '<circle cx="50" cy="50" r="47.5" fill="url(#rrGold)" stroke="' + K + '" stroke-width="1.6"/>' +
+      '<circle cx="50" cy="50" r="42.5" fill="url(#rrGoldH)" opacity=".9"/>' +
+      '<circle cx="50" cy="50" r="41" fill="url(#' + BG[k] + ')"/>' +
+      '<g opacity=".16" stroke="#fff" stroke-width="5"><path d="M50 50 L50 6 M50 50 L84 18 M50 50 L94 50 M50 50 L16 18 M50 50 L6 50"/></g>' +
+      '<g clip-path="url(#rrClip)"><image href="' + p[0] + '" x="' + p[1] + '" y="' + p[2] + '" width="' + p[3] + '" height="' + p[3] + '" preserveAspectRatio="xMidYMid meet"/></g>' +
+      '<circle cx="50" cy="50" r="41" fill="none" stroke="#000" stroke-opacity=".4" stroke-width="2.5"/>' +
+      '<path d="M17 36 A35 35 0 0 1 83 36 Q50 28 17 36Z" fill="url(#rrShine)" opacity=".35"/>' +
+      '</svg>';
+  });
+  // Painted Wild: the portal artwork with the WILD banner drawn on top so the word stays crisp.
+  ART.WILD = '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
+    '<circle cx="50" cy="44" r="46" fill="url(#rrGlowG)" opacity=".6"/>' +
+    '<image href="art/wild.webp" x="7" y="-1" width="86" height="86"/>' +
+    '<path d="M15 72 L22 63 H78 L85 72 L78 95 H22Z" fill="url(#rrMagenta)" stroke="' + K + '" stroke-width="2.4" stroke-linejoin="round"/>' +
+    '<path d="M22 65 H78" stroke="#ffc2e2" stroke-width="2"/>' +
+    '<text x="50" y="89" text-anchor="middle" font-family="Bungee, Impact, sans-serif" font-size="21" fill="url(#rrGold)" stroke="' + K + '" stroke-width="1.4" paint-order="stroke">WILD</text></svg>';
+  ART.SCAT = '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
+    '<circle cx="50" cy="44" r="46" fill="url(#rrGlowP)" opacity=".6"/>' +
+    '<image href="art/bonus.webp" x="7" y="-1" width="86" height="86"/>' +
+    '<rect x="12" y="73" width="76" height="23" rx="7" fill="url(#rrGold)" stroke="' + K + '" stroke-width="2.4"/>' +
+    '<text x="50" y="90.5" text-anchor="middle" font-family="Bungee, Impact, sans-serif" font-size="15" fill="#3a1600">BONUS</text></svg>';
+  // Plasma Orb: the prize value is laid over it by the page.
+  ART.ORB = '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><image href="art/orb.webp" x="2" y="0" width="96" height="96"/></svg>';
+  // Painted lab items: shown as they are, with a soft coloured glow behind.
+  var ITEMS = { RAY: ['art/raygun.webp', 'rrGlowP'], FLASK: ['art/flask.webp', 'rrGlowG'], ATOM: ['art/atom.webp', 'rrGlowB'], BATT: ['art/battery.webp', 'rrGlowP'] };
+  Object.keys(ITEMS).forEach(function (k) {
+    ART[k] = '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
+      '<circle cx="50" cy="50" r="44" fill="url(#' + ITEMS[k][1] + ')" opacity=".5"/>' +
+      '<image href="' + ITEMS[k][0] + '" x="2" y="2" width="96" height="96"/></svg>';
+  });
+  // The Collector is shown free-standing (no medallion) when it grabs a reel.
+  ART.COLLECTOR = '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><image href="art/collector.webp" x="0" y="0" width="100" height="100"/></svg>';
+})(this);

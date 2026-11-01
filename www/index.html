@@ -215,6 +215,12 @@ body.free .spin { background: radial-gradient(circle at 40% 30%, #d6ffc4, var(--
 .scene { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
 .scene > div { position: absolute; inset: 0; opacity: 0; transition: opacity .9s; }
 .scene svg { width: 100%; height: 100%; display: block; }
+.scene > div { background: #12061f center / cover no-repeat; }
+.scene > div::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, #0a0414aa 0%, #0a041455 40%, #0a041488 100%); }
+.sc-garage { background-image: url(art/bg-garage.webp) !important; }
+.sc-rift { background-image: url(art/bg-free.webp) !important; }
+.sc-lock { background-image: url(art/bg-lock.webp) !important; }
+.logo img { display: block; height: clamp(108px, 31vw, 150px); width: auto; margin: -10px auto -12px; filter: drop-shadow(0 4px 8px #000c); }
 body:not(.free):not(.lock) .sc-garage, body.free:not(.lock) .sc-rift, body.lock .sc-lock { opacity: 1; }
 body.dim-2 .sc-rift { filter: hue-rotate(70deg); }
 body.dim-3 .sc-rift { filter: hue-rotate(-60deg) saturate(1.2); }
@@ -367,7 +373,7 @@ body.free .spin span { font-size: 17px; }
 
 @media (max-height: 640px) {
   .marquee { padding: 8px 8px; }
-  .logo .l1 { font-size: 22px; } .logo .l2 { font-size: 26px; }
+  .logo img { height: 104px; }
   .mascot { width: 40px; }
   .spin { width: 78px; height: 78px; }
 }
@@ -477,7 +483,7 @@ select { background: var(--panel); color: var(--ink); border: 2px solid var(--li
     <div class="marquee">
       <div class="mascot" id="mascotL"></div>
       <div class="logo-wrap">
-        <h1 class="logo"><span class="l1">RIFT</span><span class="l2">RICHES</span></h1>
+        <h1 class="logo"><img src="art/logo.webp" alt="Rift Riches" width="640" height="640"></h1>
         <div class="fs-banner" id="fsBanner">RIFT RUN · 10 LEFT</div>
       </div>
       <div class="mascot r" id="mascotR"></div>
@@ -1379,9 +1385,6 @@ $('dailyBtn').addEventListener('click', function () { audio(); SFX.click(); show
 document.body.insertAdjacentHTML('afterbegin', '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>' + ART.DEFS + '</defs></svg>');
 $('mascotL').innerHTML = ART.VEX;
 $('mascotR').innerHTML = ART.GLORP;
-$('scene').children[0].innerHTML = window.RiftScenes.garage;
-$('scene').children[1].innerHTML = window.RiftScenes.rift;
-$('scene').children[2].innerHTML = window.RiftScenes.lock;
 load();
 // A free-spin run interrupted by closing the app resumes on the next spin press.
 if (state.free.remaining > 0) { document.body.classList.add('free', 'dim-1'); musicMode = 'free'; }
