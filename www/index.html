@@ -495,7 +495,7 @@ select { background: var(--panel); color: var(--ink); border: 2px solid var(--li
   .meter label { font-size: 8px; letter-spacing: .06em; white-space: nowrap; } .meter output { font-size: 14px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .controls { grid-area: ctrl; grid-template-columns: 1fr; grid-template-areas: "spin" "bet" "side"; justify-items: center; align-items: center; gap: 6px; }
   .controls .spin { grid-area: spin; width: min(76px, 18dvh); height: min(76px, 18dvh); font-size: 16px; margin: 0 0 12px; }
-  .controls .bet { grid-area: bet; gap: 2px; }
+  .controls .bet { grid-area: bet; gap: 2px; justify-self: center; }
   .controls .bet .betval { min-width: 34px; } .controls .bet .betval span { display: none; }
   .bet button { width: 28px; height: 28px; font-size: 15px; }
   .controls .side { grid-area: side; justify-self: center; }
@@ -547,7 +547,7 @@ html.force-land .meter label { font-size: 8px; letter-spacing: .06em; white-spac
 html.force-land .meter output { font-size: 14px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 html.force-land .controls { grid-area: ctrl; grid-template-columns: 1fr; grid-template-areas: "spin" "bet" "side"; justify-items: center; align-items: center; gap: 6px; }
 html.force-land .controls .spin { grid-area: spin; width: min(76px, calc(var(--lh) * 18 / 100)); height: min(76px, calc(var(--lh) * 18 / 100)); font-size: 16px; margin: 0 0 12px; }
-html.force-land .controls .bet { grid-area: bet; gap: 2px; }
+html.force-land .controls .bet { grid-area: bet; gap: 2px; justify-self: center; }
 html.force-land .controls .bet .betval { min-width: 34px; }
 html.force-land .controls .bet .betval span { display: none; }
 html.force-land .bet button { width: 28px; height: 28px; font-size: 15px; }
@@ -556,6 +556,7 @@ html.force-land .controls .pill { padding: 4px 12px; font-size: 12px; }
 html.force-land .bottom { grid-area: bottom; flex-direction: column; align-self: end; gap: 6px; }
 html.force-land .bottom button { flex: none; padding: 5px 4px; font-size: 11px; }
 /* end landscape preview */
+
 
 
 
