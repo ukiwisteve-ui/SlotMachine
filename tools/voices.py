@@ -12,7 +12,7 @@ SR = 24000
 def pitch(r): return 'rubberband=pitch=%.3f:formant=shifted:transients=smooth' % r
 CAST = {
     'VEX':       ('am_michael', 1.05, 'en-us', 'acompressor=threshold=0.2:ratio=2'),
-    'DEX':       ('am_puck', 1.18, 'en-us', pitch(1.12)),
+    'DEX':       ('af_river', 1.047, 'en-us', 'asetrate=%d,aresample=%d' % (SR * 1.07, SR)),  # sped up like tape: younger, no warble
     'GLORP':     ('am_echo', 1.08, 'en-us', pitch(1.32) + ',vibrato=f=7:d=0.35'),
     'B12':       ('am_michael', 1.0, 'en-us', 'aecho=0.8:0.85:7:0.45,flanger=delay=1:depth=2:speed=0.4'),
     'FIZZ':      ('bm_daniel', 1.08, 'en-gb', 'highpass=f=280,lowpass=f=3600'),
