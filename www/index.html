@@ -680,6 +680,7 @@ function audio() {
       sfxGain = AC.createGain(); sfxGain.connect(AC.destination);
       musicGain = AC.createGain(); musicGain.connect(AC.destination);
       applyVolumes();
+      loadSamples();
     } catch (e) { AC = null; }
   }
   if (AC && AC.state === 'suspended') AC.resume();
@@ -719,6 +720,28 @@ var SFX = {
   lockon: function () { tone(160, 0.15, 'square', 0.25, 0, 80); tone(1200, 0.12, 'sine', 0.15); },
   coin: function () { tone(1800, 0.06, 'sine', 0.12); tone(2400, 0.08, 'sine', 0.1, 0.05); }
 };
+// Recorded sound effects. Each one replaces its synth version once it has loaded; until then (or if loading fails) the synth plays.
+var SAMPLE_GAIN = { click: 0.45, spin: 0.7, stop: 0.55, win: 0.8, big: 0.9, count: 0.3, core: 0.9, tease: 0.8, bonus: 0.9 };
+var samples = {}; window.RR_samples = samples;
+function loadSamples() {
+  Object.keys(SAMPLE_GAIN).forEach(function (name) {
+    fetch('sfx/' + name + '.mp3').then(function (r) { if (!r.ok) throw 0; return r.arrayBuffer(); })
+      .then(function (buf) { return new Promise(function (ok, bad) { AC.decodeAudioData(buf, ok, bad); }); })
+      .then(function (b) { samples[name] = b; }).catch(function () {});
+  });
+}
+function playSample(name, loop) {
+  if (!AC || !state.settings.sfx || !samples[name]) return null;
+  var src = AC.createBufferSource(), g = AC.createGain();
+  src.buffer = samples[name]; src.loop = !!loop; g.gain.value = SAMPLE_GAIN[name];
+  src.connect(g); g.connect(sfxGain); src.start();
+  return { stop: function (fade) { try { var t = AC.currentTime; g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(0, t + (fade || 0.12)); src.stop(t + (fade || 0.12) + 0.02); } catch (e) {} } };
+}
+Object.keys(SAMPLE_GAIN).forEach(function (name) {
+  var synth = SFX[name] || function () {};
+  SFX[name] = function () { if (!playSample(name)) synth(); };
+});
+SFX.countLoop = function () { return playSample('count', true); };
 // Three synthesised music tracks, one per mode, scheduled slightly ahead of time.
 var BASS = [55, 55, 65.4, 55, 49, 49, 58.3, 61.7];
 var ARP = [220, 261.6, 329.6, 392, 329.6, 261.6, 196, 246.9];
@@ -1236,10 +1259,11 @@ async function runLockdown(res, totalBet) {
 function countUp(el, to, ms) {
   ms = ms || Math.min(1200, 300 + to / 20);
   var start = performance.now();
+  var tick = to > 0 && ms >= 500 ? SFX.countLoop() : null;
   function step(t) {
     var p = Math.min(1, (t - start) / ms);
     el.textContent = fmt(to * (1 - Math.pow(1 - p, 3)));
-    if (p < 1) requestAnimationFrame(step);
+    if (p < 1) requestAnimationFrame(step); else if (tick) tick.stop(0.2);
   }
   requestAnimationFrame(step);
 }
