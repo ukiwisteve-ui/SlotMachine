@@ -443,6 +443,10 @@ select { background: var(--panel); color: var(--ink); border: 2px solid var(--li
 .coinfall { position: absolute; top: -40px; width: 26px; height: 26px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff3b0, var(--gold) 45%, #c98a00); border: 2px solid #7a5200; animation: fall linear forwards; }
 @keyframes fall { to { transform: translateY(115vh) rotate(720deg); } }
 
+.rotate-hint { display: none; position: fixed; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 64px); transform: translateX(-50%); z-index: 55; align-items: center; gap: 10px; background: #0b0418ee; color: var(--ink); border: 2px solid var(--gold); border-radius: 14px; padding: 8px 14px; font-weight: 600; font-size: 13px; box-shadow: 0 6px 20px #000a; white-space: nowrap; }
+.rotate-hint svg { width: 26px; height: 26px; flex: none; animation: tilt 1.6s ease-in-out infinite alternate; }
+@keyframes tilt { from { transform: rotate(0); } to { transform: rotate(-90deg); } }
+@media (orientation: portrait) and (pointer: coarse) { body:not(.hint-off) .rotate-hint { display: flex; } }
 .toast { position: fixed; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 12px); transform: translateX(-50%); z-index: 60; background: var(--ink); color: #1b0d2e; font-weight: 600; border-radius: 12px; padding: 9px 14px; box-shadow: 0 6px 20px #0008; max-width: calc(100% - 32px); text-align: center; animation: drop .25s ease-out; }
 @keyframes drop { from { transform: translate(-50%, -20px); opacity: 0; } }
 
@@ -484,6 +488,7 @@ select { background: var(--panel); color: var(--ink); border: 2px solid var(--li
 }
 </style>
 
+<button class="rotate-hint" id="rotateHint" aria-label="Rotate your phone for the best view. Tap to hide."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/></svg>Turn your phone sideways for the best view</button>
 <div class="scene" id="scene"><div class="sc-garage"></div><div class="sc-rift"></div><div class="sc-lock"></div></div>
 
 <div class="app" id="app">
@@ -581,6 +586,13 @@ select { background: var(--panel); color: var(--ink); border: 2px solid var(--li
     <div class="row"><label for="setSkip">Skip win celebrations</label><span class="switch"><input type="checkbox" id="setSkip"><span></span></span></div>
     <div class="row"><label for="setRemind">Play-time reminder<small>A nudge after this much play</small></label>
       <select id="setRemind"><option value="0">Off</option><option value="30">30 minutes</option><option value="60">1 hour</option><option value="120">2 hours</option></select>
+    </div>
+    <h3>Test features</h3>
+    <p class="note">Prototype only. Pick one and your next spin lands it. These come out before release.</p>
+    <div class="actions">
+      <button class="btn alt" data-force="free">Free spins</button>
+      <button class="btn alt" data-force="lock">Lockdown</button>
+      <button class="btn alt" data-force="big">Big win</button>
     </div>
     <h3>About</h3>
     <p class="note">Rift Riches is for players aged 18 and over. Coins have no cash value and can never be withdrawn or exchanged for prizes. Prototype 0.2, test mode: purchases are free.</p>
@@ -1078,6 +1090,7 @@ async function doSpin() {
   clearWins(); $('winOut').textContent = '0'; render();
   SFX.spin();
   var res = E.spin({ lineBet: lb, free: free });
+  if (forceNext && !free) { res = forcedSpin(forceNext, lb, total) || res; forceNext = null; }
   await animateReels(res.rawGrid, free ? null : res.orbs);
   if (res.collectorReel >= 0) await collectorEffect(res.collectorReel);
 
@@ -1314,6 +1327,24 @@ function toast(msg) {
   clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.remove(); }, 2600);
 }
 function openModal(id) { $(id).hidden = false; var b = $(id).querySelector('button'); if (b) b.focus({ preventScroll: true }); }
+// Test features: re-roll real spins until one lands the chosen feature, so it plays exactly as it would naturally.
+var forceNext = null;
+function forcedSpin(kind, lb, total) {
+  for (var i = 0; i < 20000; i++) {
+    var r = E.spin({ lineBet: lb, free: false });
+    if (kind === 'free' && r.freeSpins) return r;
+    if (kind === 'lock' && r.lockdown) return r;
+    if (kind === 'big' && r.total >= total * 15 && !r.freeSpins && !r.lockdown) return r;
+  }
+  return null;
+}
+document.querySelectorAll('[data-force]').forEach(function (b) {
+  b.addEventListener('click', function () {
+    forceNext = b.getAttribute('data-force');
+    closeModal('settingsModal');
+    toast({ free: 'Free spins', lock: 'Lockdown', big: 'Big win' }[forceNext] + ' on your next spin');
+  });
+});
 function closeModal(id) { $(id).hidden = true; }
 document.querySelectorAll('.modal').forEach(function (m) {
   m.addEventListener('click', function (e) {
@@ -1423,6 +1454,15 @@ $('autoBtn').addEventListener('click', function () {
   audio(); SFX.click();
   auto = !auto; this.setAttribute('aria-pressed', String(auto));
   if (auto && !spinning && state.free.remaining === 0) doSpin();
+});
+// Landscape: ask the phone to lock sideways on the first tap (works in Chrome on Android and in the app), and hint otherwise.
+$('rotateHint').addEventListener('click', function () { document.body.classList.add('hint-off'); });
+setTimeout(function () { document.body.classList.add('hint-off'); }, 8000);
+document.addEventListener('pointerdown', function lockLandscape() {
+  document.removeEventListener('pointerdown', lockLandscape);
+  if (!window.matchMedia('(pointer: coarse)').matches || !screen.orientation || !screen.orientation.lock) return;
+  var el = document.documentElement, fs = el.requestFullscreen ? el.requestFullscreen({ navigationUI: 'hide' }) : null;
+  Promise.resolve(fs).then(function () { return screen.orientation.lock('landscape'); }).catch(function () {});
 });
 $('openShop').addEventListener('click', function () { audio(); SFX.click(); renderShop(); openModal('shopModal'); });
 $('openPay').addEventListener('click', function () { audio(); SFX.click(); renderPaytable(); openModal('payModal'); });
