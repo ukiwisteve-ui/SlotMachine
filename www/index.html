@@ -924,7 +924,7 @@ function spinReel(r, finalCol, cell, fast, extra, tease, vals) {
       strip.style.transform = 'translateY(0px)';
       reelEls[r].classList.remove('tease');
       visible[r] = finalCol.slice();
-      SFX.stop(); vibrate(8);
+      if (r >= 3) SFX.stop(); vibrate(8);
       if (finalCol.indexOf('SCAT') >= 0) SFX.core();
       if (finalCol.indexOf('ORB') >= 0) SFX.orb();
       resolve();
