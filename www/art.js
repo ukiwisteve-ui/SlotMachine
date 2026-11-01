@@ -1,122 +1,242 @@
-/* Rift Riches artwork: original cartoon symbols drawn as inline SVG (viewBox 0 0 100 100). */
+/* Rift Riches artwork: original cartoon symbols drawn as inline SVG (viewBox 0 0 100 100).
+   Shared gradients live once in RiftArt.DEFS, which the page mounts in a hidden <svg> so every symbol can use them. */
 (function (root) {
   'use strict';
   var K = '#1b0d2e'; // outline ink
-  var s = 'stroke="' + K + '" stroke-width="3" stroke-linejoin="round"';
+  var s = 'stroke="' + K + '" stroke-width="2.6" stroke-linejoin="round"';
   function svg(body) { return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' + body + '</svg>'; }
+  function lin(id, stops, x2, y2) {
+    return '<linearGradient id="' + id + '" x1="0" y1="0" x2="' + (x2 === undefined ? 0 : x2) + '" y2="' + (y2 === undefined ? 1 : y2) + '">' +
+      stops.map(function (st) { return '<stop offset="' + st[0] + '" stop-color="' + st[1] + '"' + (st[2] !== undefined ? ' stop-opacity="' + st[2] + '"' : '') + '/>'; }).join('') + '</linearGradient>';
+  }
+  function rad(id, stops, cx, cy, r) {
+    return '<radialGradient id="' + id + '" cx="' + (cx || .5) + '" cy="' + (cy || .5) + '" r="' + (r || .5) + '">' +
+      stops.map(function (st) { return '<stop offset="' + st[0] + '" stop-color="' + st[1] + '"' + (st[2] !== undefined ? ' stop-opacity="' + st[2] + '"' : '') + '/>'; }).join('') + '</radialGradient>';
+  }
+
+  var DEFS =
+    lin('rrGold', [[0, '#fff7c9'], [.3, '#ffd54a'], [.55, '#b97a00'], [.75, '#ffe27a'], [1, '#7a4c00']]) +
+    lin('rrGoldH', [[0, '#7a4c00'], [.25, '#ffe27a'], [.5, '#fff7c9'], [.75, '#ffd54a'], [1, '#7a4c00']], 1, 0) +
+    lin('rrChrome', [[0, '#ffffff'], [.45, '#b8c2d6'], [.55, '#5d6880'], [1, '#e6ebf5']]) +
+    lin('rrShine', [[0, '#ffffff', .75], [1, '#ffffff', 0]]) +
+    rad('rrBgVex', [[0, '#c99bff'], [.65, '#6a2fc4'], [1, '#2d0f63']], .5, .35, .7) +
+    rad('rrBgDex', [[0, '#ffd28a'], [.65, '#e07a12'], [1, '#7a3300']], .5, .35, .7) +
+    rad('rrBgGlorp', [[0, '#d2ffb8'], [.6, '#3fae1e'], [1, '#0f4a08']], .5, .35, .7) +
+    rad('rrBgB12', [[0, '#b8e6ff'], [.6, '#2f78c4'], [1, '#0c2a5c']], .5, .35, .7) +
+    rad('rrBgFizz', [[0, '#b0fff2'], [.6, '#1aa898'], [1, '#063f3a']], .5, .35, .7) +
+    rad('rrSkin', [[0, '#ffe6cc'], [.7, '#f2bf8f'], [1, '#d99a66']], .45, .35, .65) +
+    rad('rrGoo', [[0, '#e2ffd0'], [.45, '#8dff5a'], [1, '#2f9a12']], .38, .3, .75) +
+    lin('rrCoat', [[0, '#9b6cf0'], [1, '#4b1f9e']]) +
+    lin('rrHoodie', [[0, '#ffd966'], [1, '#e09a10']]) +
+    lin('rrSuit', [[0, '#46507a'], [1, '#1d2238']]) +
+    lin('rrSteel', [[0, '#eef2fa'], [.5, '#b9c3d6'], [1, '#7d889e']]) +
+    lin('rrInsect', [[0, '#7affea'], [1, '#1f9e8f']]) +
+    lin('rrHair', [[0, '#ffffff'], [1, '#c9d4ee']]) +
+    lin('rrBrown', [[0, '#9a6234'], [1, '#5a3315']]) +
+    lin('rrMagenta', [[0, '#ff8fca'], [.5, '#ff3d9a'], [1, '#a3115a']]) +
+    lin('rrPurple', [[0, '#a77bff'], [1, '#4b1f9e']]) +
+    lin('rrGlass', [[0, '#ffffff', .85], [1, '#cfe6ff', .55]], 1, 0) +
+    lin('rrBatt', [[0, '#5a4380'], [1, '#2a1a45']]) +
+    rad('rrNucleus', [[0, '#fff3b0'], [.6, '#ffcc33'], [1, '#c98a00']], .4, .35, .7) +
+    rad('rrOrb', [[0, '#f0fdff'], [.3, '#7fe0ff'], [.7, '#2b5cff'], [1, '#101a5c']], .38, .32, .75) +
+    rad('rrCore', [[0, '#fff0f8'], [.35, '#ff7ac0'], [.8, '#c2126a'], [1, '#5a0632']], .5, .45, .6) +
+    rad('rrPortal', [[0, '#eaffdd'], [.25, '#8dff5a'], [.6, '#147a3a'], [1, '#04140a']], .5, .5, .55) +
+    rad('rrGlowG', [[0, '#c4ffa8', .9], [1, '#7cff4f', 0]]) +
+    rad('rrGlowP', [[0, '#ffc2e2', .9], [1, '#ff3d9a', 0]]) +
+    rad('rrGlowB', [[0, '#c8f2ff', .9], [1, '#3ad7ff', 0]]) +
+    rad('rrGlowY', [[0, '#fff3b0', .9], [1, '#ffcc33', 0]]) +
+    rad('rrSquid', [[0, '#d7a6ff'], [.7, '#8a3fd6'], [1, '#4a1580']], .45, .35, .7) +
+    '<clipPath id="rrClip"><circle cx="50" cy="50" r="41"/></clipPath>';
+
+  // Gold-rimmed medallion used by the five character symbols.
+  function medal(bg, inner) {
+    return svg(
+      '<circle cx="50" cy="51.5" r="48" fill="#000" opacity=".35"/>' +
+      '<circle cx="50" cy="50" r="47.5" fill="url(#rrGold)" stroke="' + K + '" stroke-width="1.6"/>' +
+      '<circle cx="50" cy="50" r="42.5" fill="url(#rrGoldH)" opacity=".9"/>' +
+      '<circle cx="50" cy="50" r="41" fill="url(#' + bg + ')"/>' +
+      '<g opacity=".18" stroke="#fff" stroke-width="5">' +
+        '<path d="M50 50 L50 6 M50 50 L84 18 M50 50 L94 50 M50 50 L16 18 M50 50 L6 50"/></g>' +
+      '<g clip-path="url(#rrClip)">' + inner + '</g>' +
+      '<circle cx="50" cy="50" r="41" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="2.5"/>' +
+      '<path d="M17 36 A35 35 0 0 1 83 36 Q50 26 17 36Z" fill="url(#rrShine)" opacity=".55"/>'
+    );
+  }
+
+  var VEX_INNER =
+    '<path d="M12 104 Q14 76 50 72 Q86 76 88 104Z" fill="url(#rrCoat)" ' + s + '/>' +
+    '<path d="M50 74 L40 104 M50 74 L60 104" stroke="#2d0f63" stroke-width="2" opacity=".5"/>' +
+    '<path d="M38 73 L50 88 L62 73" fill="#f1ecff" ' + s + '/>' +
+    '<circle cx="70" cy="92" r="4.2" fill="#7CFF4F"/><circle cx="71" cy="91" r="1.4" fill="#fff" opacity=".8"/><circle cx="27" cy="96" r="2.6" fill="#7CFF4F"/>' +
+    '<path d="M29 36 L22 9 L36 21 L40 1 L50 18 L60 1 L64 21 L78 9 L71 36Z" fill="url(#rrHair)" ' + s + '/>' +
+    '<path d="M36 21 L40 8 M60 8 L64 21" stroke="#9aa6c8" stroke-width="1.5" fill="none"/>' +
+    '<ellipse cx="50" cy="48" rx="21" ry="25" fill="url(#rrSkin)" ' + s + '/>' +
+    '<ellipse cx="29" cy="50" rx="3.5" ry="6" fill="url(#rrSkin)" ' + s + '/><ellipse cx="71" cy="50" rx="3.5" ry="6" fill="url(#rrSkin)" ' + s + '/>' +
+    '<path d="M33 60 Q50 76 67 60 Q60 72 50 73 Q40 72 33 60Z" fill="#c98a5a" opacity=".35"/>' +
+    '<rect x="28" y="27" width="44" height="6" rx="2" fill="#3a2a4f"/>' +
+    '<circle cx="40" cy="30" r="7.5" fill="url(#rrChrome)" ' + s + '/><circle cx="40" cy="30" r="5" fill="#7fe8ff"/>' +
+    '<circle cx="60" cy="30" r="7.5" fill="url(#rrChrome)" ' + s + '/><circle cx="60" cy="30" r="5" fill="#7fe8ff"/>' +
+    '<path d="M38 27.5 L41 26.5 M58 27.5 L61 26.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>' +
+    '<path d="M57.5 26 L61 30 L58.5 33.5" stroke="' + K + '" stroke-width="1.2" fill="none"/>' +
+    '<path d="M35 41 L46 44 M65 41 L54 44" stroke="' + K + '" stroke-width="3.6" stroke-linecap="round"/>' +
+    '<ellipse cx="42" cy="48.5" rx="4" ry="3.6" fill="#fff" stroke="' + K + '" stroke-width="1.5"/><ellipse cx="58" cy="48.5" rx="4" ry="3.6" fill="#fff" stroke="' + K + '" stroke-width="1.5"/>' +
+    '<circle cx="42.5" cy="49" r="2" fill="' + K + '"/><circle cx="57.5" cy="49" r="2" fill="' + K + '"/>' +
+    '<circle cx="43.2" cy="48.2" r=".7" fill="#fff"/><circle cx="58.2" cy="48.2" r=".7" fill="#fff"/>' +
+    '<path d="M37.5 53 Q42 55.5 46.5 53 M53.5 53 Q58 55.5 62.5 53" stroke="#a8764f" stroke-width="1.5" fill="none"/>' +
+    '<path d="M48 50 Q46 57 50 58 Q53 58 52 56" stroke="#b5835a" stroke-width="1.8" fill="none"/>' +
+    '<path d="M40 63 Q50 59.5 61 62.5" stroke="' + K + '" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+    '<path d="M60 62 L63 60" stroke="' + K + '" stroke-width="2" stroke-linecap="round"/>' +
+    '<ellipse cx="41" cy="38" rx="9" ry="4" fill="#fff" opacity=".18"/>';
+
+  var DEX_INNER =
+    '<path d="M10 104 Q12 72 50 68 Q88 72 90 104Z" fill="url(#rrHoodie)" ' + s + '/>' +
+    '<path d="M30 74 Q50 90 70 74" fill="none" stroke="#b87400" stroke-width="2.4"/>' +
+    '<path d="M44 76 L42.5 94 M56 76 L57.5 94" stroke="' + K + '" stroke-width="2.2"/><circle cx="42.5" cy="95" r="2" fill="#fff" ' + s + '/><circle cx="57.5" cy="95" r="2" fill="#fff" ' + s + '/>' +
+    '<ellipse cx="50" cy="46" rx="20.5" ry="22.5" fill="url(#rrSkin)" ' + s + '/>' +
+    '<ellipse cx="30" cy="48" rx="3.2" ry="5.5" fill="url(#rrSkin)" ' + s + '/><ellipse cx="70" cy="48" rx="3.2" ry="5.5" fill="url(#rrSkin)" ' + s + '/>' +
+    '<path d="M28.5 42 Q27 17 50 17 Q73 17 71.5 42 Q67 30 61 34 Q57 25 50 32 Q43 25 39 34 Q33 30 28.5 42Z" fill="url(#rrBrown)" ' + s + '/>' +
+    '<path d="M40 22 Q46 19 52 21" stroke="#c99062" stroke-width="2" fill="none" stroke-linecap="round"/>' +
+    '<path d="M35.5 37.5 L46 35 M64.5 37.5 L54 35" stroke="' + K + '" stroke-width="2.6" stroke-linecap="round"/>' +
+    '<circle cx="42" cy="45.5" r="7" fill="#fff" stroke="' + K + '" stroke-width="2.2"/><circle cx="58" cy="45.5" r="7" fill="#fff" stroke="' + K + '" stroke-width="2.2"/>' +
+    '<circle cx="42.5" cy="46" r="2.3" fill="#4a2a10"/><circle cx="57.5" cy="46" r="2.3" fill="#4a2a10"/>' +
+    '<circle cx="43.3" cy="45.2" r=".8" fill="#fff"/><circle cx="58.3" cy="45.2" r=".8" fill="#fff"/>' +
+    '<ellipse cx="35" cy="54" rx="4" ry="2.2" fill="#ff8a8a" opacity=".45"/><ellipse cx="65" cy="54" rx="4" ry="2.2" fill="#ff8a8a" opacity=".45"/>' +
+    '<rect x="41.5" y="55" width="17" height="8" rx="3.5" fill="#fff" stroke="' + K + '" stroke-width="2.2"/>' +
+    '<path d="M42 59 H58 M46 55.5 V62.5 M50 55.5 V62.5 M54 55.5 V62.5" stroke="#9aa3b5" stroke-width="1.3"/>' +
+    '<path d="M74 26 Q79 36 74 40 Q69 36 74 26Z" fill="#7fd8ff" stroke="' + K + '" stroke-width="1.5"/><ellipse cx="72.6" cy="34" rx="1" ry="2" fill="#fff"/>';
+
+  var GLORP_INNER =
+    '<ellipse cx="50" cy="94" rx="40" ry="10" fill="#000" opacity=".25"/>' +
+    '<path d="M20 66 Q9 62 6 52 M80 64 Q91 60 94 50" stroke="' + K + '" stroke-width="5" fill="none" stroke-linecap="round"/>' +
+    '<path d="M20 66 Q9 62 6 52 M80 64 Q91 60 94 50" stroke="#6fe63f" stroke-width="2.6" fill="none" stroke-linecap="round"/>' +
+    '<path d="M17 92 Q10 60 25 38 Q38 14 54 18 Q80 20 83 48 Q91 74 83 92 Q75 99 67 92 Q59 99 50 92 Q41 99 33 92 Q24 99 17 92Z" fill="url(#rrGoo)" ' + s + '/>' +
+    '<path d="M28 44 Q34 28 46 24" stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none" opacity=".5"/>' +
+    '<circle cx="70" cy="80" r="3.4" fill="#e2ffd0" opacity=".8"/><circle cx="27" cy="77" r="2.2" fill="#e2ffd0" opacity=".8"/><circle cx="62" cy="30" r="1.8" fill="#e2ffd0" opacity=".8"/>' +
+    '<circle cx="52" cy="49" r="16" fill="#fff" ' + s + '/><circle cx="55" cy="51" r="8.5" fill="#3a1d7a"/><circle cx="55" cy="51" r="4.5" fill="#12052b"/>' +
+    '<circle cx="58" cy="47.5" r="2.8" fill="#fff"/><circle cx="52.5" cy="54.5" r="1.2" fill="#fff"/>' +
+    '<path d="M36 36 Q44 30 52 32" stroke="' + K + '" stroke-width="2.4" fill="none" stroke-linecap="round"/>' +
+    '<path d="M40 72 Q52 84 64 72Z" fill="#3a1d7a" ' + s + '/><path d="M45 75 Q52 80 59 75" fill="#ff7aa8"/>' +
+    '<path d="M48 72 L49.5 76 L51 72" fill="#fff"/>';
+
+  var B12_INNER =
+    '<path d="M24 104 V78 Q24 71 31 71 H69 Q76 71 76 78 V104Z" fill="url(#rrSteel)" ' + s + '/>' +
+    '<circle cx="40" cy="90" r="3" fill="#7d889e"/><circle cx="60" cy="90" r="3" fill="#7d889e"/>' +
+    '<path d="M37 70 L50 77 L63 70 L63 84 L50 77 L37 84Z" fill="url(#rrMagenta)" ' + s + '/><circle cx="50" cy="77" r="3.4" fill="#ff3d9a" ' + s + '/>' +
+    '<path d="M50 10 V22" stroke="' + K + '" stroke-width="3"/><circle cx="50" cy="9" r="5" fill="url(#rrMagenta)" ' + s + '/><circle cx="48.5" cy="7.5" r="1.4" fill="#fff"/>' +
+    '<rect x="20" y="21" width="60" height="47" rx="9" fill="url(#rrSteel)" ' + s + '/>' +
+    '<rect x="23" y="24" width="54" height="6" rx="3" fill="#fff" opacity=".55"/>' +
+    '<circle cx="25.5" cy="63" r="1.6" fill="#7d889e"/><circle cx="74.5" cy="63" r="1.6" fill="#7d889e"/><circle cx="25.5" cy="33" r="1.6" fill="#7d889e"/><circle cx="74.5" cy="33" r="1.6" fill="#7d889e"/>' +
+    '<rect x="29" y="34" width="42" height="16" rx="8" fill="' + K + '"/>' +
+    '<circle cx="50" cy="42" r="11" fill="#ff3b3b" opacity=".25"/><circle cx="50" cy="42" r="6" fill="#ff3b3b"/><circle cx="50" cy="42" r="2.6" fill="#ffd0d0"/>' +
+    '<path d="M33 37 L39 37" stroke="#fff" stroke-width="1.5" opacity=".5" stroke-linecap="round"/>' +
+    '<rect x="35" y="54" width="30" height="9" rx="2.5" fill="#5d6880" stroke="' + K + '" stroke-width="2"/>' +
+    '<path d="M41 54 V63 M47 54 V63 M53 54 V63 M59 54 V63" stroke="#2a3245" stroke-width="1.6"/>' +
+    '<path d="M64 46 Q68 44 70 47" stroke="' + K + '" stroke-width="2" fill="none"/>';
+
+  var FIZZ_INNER =
+    '<path d="M12 104 Q14 76 50 71 Q86 76 88 104Z" fill="url(#rrSuit)" ' + s + '/>' +
+    '<path d="M42 72 L50 104 L58 72Z" fill="#fff"/><path d="M47.5 75 L50 96 L52.5 75 L50 72Z" fill="url(#rrMagenta)"/>' +
+    '<path d="M42 72 L36 86 L46 80Z M58 72 L64 86 L54 80Z" fill="#2d3550" ' + s + '/>' +
+    '<path d="M41 22 Q34 8 24 6 M59 22 Q66 8 76 6" stroke="' + K + '" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+    '<circle cx="24" cy="6" r="4.2" fill="url(#rrInsect)" stroke="' + K + '" stroke-width="2"/><circle cx="76" cy="6" r="4.2" fill="url(#rrInsect)" stroke="' + K + '" stroke-width="2"/>' +
+    '<path d="M29 41 Q29 17 50 17 Q71 17 71 41 Q71 63 50 71 Q29 63 29 41Z" fill="url(#rrInsect)" ' + s + '/>' +
+    '<path d="M36 26 Q44 20 54 21" stroke="#fff" stroke-width="3.5" stroke-linecap="round" fill="none" opacity=".45"/>' +
+    '<path d="M28 36 H72 L70 47 Q62 55 53.5 45 H46.5 Q38 55 30 47Z" fill="#0d0d14" stroke="' + K + '" stroke-width="2"/>' +
+    '<path d="M33 39 L41 39 M58 39 L64 39" stroke="#fff" opacity=".7" stroke-width="2" stroke-linecap="round"/>' +
+    '<path d="M31 44 Q36 50 42 47" stroke="#6b7cff" stroke-width="1.4" fill="none" opacity=".7"/>' +
+    '<path d="M43 59 L50 64 L57 59" stroke="' + K + '" stroke-width="2.6" fill="none" stroke-linecap="round"/>' +
+    '<path d="M46 62 L45 66 M54 62 L55 66" stroke="' + K + '" stroke-width="2" stroke-linecap="round"/>' +
+    '<rect x="64" y="74" width="22" height="27" rx="2.5" fill="#c8915a" stroke="' + K + '" stroke-width="2.4"/>' +
+    '<rect x="68" y="79" width="14" height="18" fill="#fff"/><path d="M70 84 H80 M70 88 H78 M70 92 H80" stroke="#9aa3b5" stroke-width="1.4"/>' +
+    '<rect x="71" y="71" width="8" height="5" rx="1" fill="url(#rrChrome)" stroke="' + K + '" stroke-width="2"/>';
 
   var ART = {
-    VEX: svg(
-      '<path d="M14 100 Q16 74 50 70 Q84 74 86 100Z" fill="#7b4fd6" ' + s + '/>' +
-      '<path d="M38 72 L50 86 L62 72" fill="#e8e3f5" ' + s + '/>' +
-      '<circle cx="70" cy="90" r="4" fill="#7CFF4F"/><circle cx="25" cy="94" r="2.5" fill="#7CFF4F"/>' +
-      '<path d="M30 34 L24 8 L37 21 L41 2 L50 19 L59 2 L63 21 L76 8 L70 34Z" fill="#f4f7ff" ' + s + '/>' +
-      '<ellipse cx="50" cy="46" rx="21" ry="25" fill="#f0c9a0" ' + s + '/>' +
-      '<rect x="28" y="26" width="44" height="6" fill="#3a2a4f"/>' +
-      '<circle cx="40" cy="29" r="7" fill="#8fe8ff" ' + s + '/><circle cx="60" cy="29" r="7" fill="#8fe8ff" ' + s + '/>' +
-      '<path d="M57 24 L61 29 L58 33" stroke="' + K + '" stroke-width="1.5" fill="none"/>' +
-      '<path d="M35 40 L46 43 M65 40 L54 43" stroke="' + K + '" stroke-width="3.5" stroke-linecap="round"/>' +
-      '<circle cx="42" cy="47" r="2.6" fill="' + K + '"/><circle cx="58" cy="47" r="2.6" fill="' + K + '"/>' +
-      '<path d="M38 51 Q42 53 46 51 M54 51 Q58 53 62 51" stroke="#b3866a" stroke-width="1.6" fill="none"/>' +
-      '<path d="M41 61 Q50 57 60 60" stroke="' + K + '" stroke-width="3" fill="none" stroke-linecap="round"/>'
-    ),
-    DEX: svg(
-      '<path d="M12 100 Q14 70 50 66 Q86 70 88 100Z" fill="#f5c542" ' + s + '/>' +
-      '<path d="M44 72 L43 88 M56 72 L57 88" stroke="' + K + '" stroke-width="2.2"/>' +
-      '<ellipse cx="50" cy="44" rx="20" ry="22" fill="#f6d2ae" ' + s + '/>' +
-      '<path d="M29 40 Q28 17 50 17 Q72 17 71 40 Q66 29 60 33 Q56 25 50 31 Q44 25 40 33 Q34 29 29 40Z" fill="#7a4a24" ' + s + '/>' +
-      '<path d="M36 36 L46 33.5 M64 36 L54 33.5" stroke="' + K + '" stroke-width="2.5" stroke-linecap="round"/>' +
-      '<circle cx="42" cy="44" r="6.5" fill="#fff" stroke="' + K + '" stroke-width="2.5"/><circle cx="58" cy="44" r="6.5" fill="#fff" stroke="' + K + '" stroke-width="2.5"/>' +
-      '<circle cx="42" cy="44" r="1.8" fill="' + K + '"/><circle cx="58" cy="44" r="1.8" fill="' + K + '"/>' +
-      '<rect x="42" y="54" width="16" height="7.5" rx="3" fill="#fff" stroke="' + K + '" stroke-width="2.5"/>' +
-      '<path d="M42.5 57.8 H57.5" stroke="#9aa3b5" stroke-width="1.6"/>' +
-      '<path d="M73 27 Q77.5 36 73 39.5 Q68.5 36 73 27Z" fill="#6fd3ff" stroke="' + K + '" stroke-width="1.6"/>'
-    ),
-    GLORP: svg(
-      '<path d="M20 64 Q10 60 7 51 M81 62 Q91 58 93 49" stroke="' + K + '" stroke-width="3.5" fill="none" stroke-linecap="round"/>' +
-      '<path d="M18 88 Q11 60 26 40 Q38 17 54 21 Q79 23 82 50 Q90 74 82 88 Q74 95 66 88 Q58 95 50 88 Q42 95 34 88 Q24 95 18 88Z" fill="#7CFF4F" ' + s + '/>' +
-      '<ellipse cx="33" cy="40" rx="4.5" ry="9" fill="#fff" opacity=".55" transform="rotate(25 33 40)"/>' +
-      '<circle cx="70" cy="76" r="3" fill="#c4ffa8"/><circle cx="28" cy="74" r="2" fill="#c4ffa8"/>' +
-      '<circle cx="52" cy="49" r="15" fill="#fff" ' + s + '/><circle cx="55" cy="51" r="7" fill="#2a1450"/><circle cx="57.5" cy="48" r="2.3" fill="#fff"/>' +
-      '<path d="M41 71 Q52 81 63 71Z" fill="#2a1450" ' + s + '/>'
-    ),
-    B12: svg(
-      '<path d="M26 100 V76 Q26 70 32 70 H68 Q74 70 74 76 V100Z" fill="#aeb8cc" ' + s + '/>' +
-      '<path d="M38 69 L50 75 L62 69 L62 81 L50 75 L38 81Z" fill="#e0245e" ' + s + '/><circle cx="50" cy="75" r="3.2" fill="#e0245e" ' + s + '/>' +
-      '<path d="M50 9 V21" stroke="' + K + '" stroke-width="3"/><circle cx="50" cy="8" r="4.5" fill="#ff3d9a" ' + s + '/>' +
-      '<rect x="22" y="20" width="56" height="46" rx="8" fill="#c9d1e0" ' + s + '/>' +
-      '<rect x="27" y="25" width="11" height="4" rx="2" fill="#fff" opacity=".8"/>' +
-      '<rect x="31" y="33" width="38" height="15" rx="7.5" fill="' + K + '"/>' +
-      '<circle cx="50" cy="40.5" r="9" fill="#ff3b3b" opacity=".35"/><circle cx="50" cy="40.5" r="5" fill="#ff3b3b"/>' +
-      '<rect x="36" y="52" width="28" height="9" rx="2" fill="#8d97ab" stroke="' + K + '" stroke-width="2.2"/>' +
-      '<path d="M42 52 V61 M48 52 V61 M54 52 V61 M60 52 V61" stroke="' + K + '" stroke-width="1.8"/>'
-    ),
-    FIZZ: svg(
-      '<path d="M14 100 Q16 74 50 70 Q84 74 86 100Z" fill="#2d3550" ' + s + '/>' +
-      '<path d="M43 72 L50 99 L57 72Z" fill="#fff"/><path d="M48 74 L50 93 L52 74Z" fill="#e0245e"/>' +
-      '<path d="M41 22 Q35 9 26 7 M59 22 Q65 9 74 7" stroke="' + K + '" stroke-width="3" fill="none" stroke-linecap="round"/>' +
-      '<circle cx="26" cy="7" r="3.8" fill="#3fd0c0" stroke="' + K + '" stroke-width="2"/><circle cx="74" cy="7" r="3.8" fill="#3fd0c0" stroke="' + K + '" stroke-width="2"/>' +
-      '<path d="M30 40 Q30 18 50 18 Q70 18 70 40 Q70 62 50 70 Q30 62 30 40Z" fill="#3fd0c0" ' + s + '/>' +
-      '<path d="M29 35 H71 L69 46 Q61 53 53 44 H47 Q39 53 31 46Z" fill="#111" stroke="' + K + '" stroke-width="2"/>' +
-      '<path d="M35 39 L42 39" stroke="#fff" opacity=".65" stroke-width="2" stroke-linecap="round"/>' +
-      '<path d="M44 58 L50 62.5 L56 58" stroke="' + K + '" stroke-width="2.6" fill="none" stroke-linecap="round"/>' +
-      '<rect x="65" y="74" width="21" height="25" rx="2" fill="#c8915a" stroke="' + K + '" stroke-width="2.5"/>' +
-      '<rect x="69" y="79" width="13" height="16" fill="#fff"/><path d="M71 84 H80 M71 88 H78" stroke="#9aa3b5" stroke-width="1.5"/>' +
-      '<rect x="71.5" y="71" width="8" height="5" rx="1" fill="#9aa3b5" stroke="' + K + '" stroke-width="2"/>'
-    ),
+    VEX: medal('rrBgVex', VEX_INNER),
+    DEX: medal('rrBgDex', DEX_INNER),
+    GLORP: medal('rrBgGlorp', GLORP_INNER),
+    B12: medal('rrBgB12', B12_INNER),
+    FIZZ: medal('rrBgFizz', FIZZ_INNER),
+
     RAY: svg(
-      '<circle cx="88" cy="47" r="9" fill="#7CFF4F" opacity=".3"/><circle cx="88" cy="47" r="4.5" fill="#7CFF4F"/>' +
-      '<path d="M34 34 L40 22 H49 L47 34" fill="#ffcc33" ' + s + '/>' +
-      '<path d="M37 59 L30 82 Q30 87 35 87 H42 Q46 87 47 83 L50 59Z" fill="#7b4fd6" ' + s + '/>' +
-      '<path d="M18 46 Q18 33 33 33 H64 L74 39 V55 L64 61 H33 Q18 61 18 46Z" fill="#ff3d9a" ' + s + '/>' +
-      '<rect x="74" y="41" width="7" height="12" fill="#ffcc33" stroke="' + K + '" stroke-width="2.5"/>' +
-      '<circle cx="38" cy="47" r="5.5" fill="#8fe8ff" stroke="' + K + '" stroke-width="2.5"/>' +
-      '<path d="M52 41 H64 M52 47 H66 M52 53 H64" stroke="' + K + '" stroke-width="2" opacity=".55"/>'
+      '<circle cx="50" cy="50" r="44" fill="url(#rrGlowP)" opacity=".55"/>' +
+      '<circle cx="88" cy="46" r="10" fill="url(#rrGlowG)"/><circle cx="88" cy="46" r="4" fill="#eaffdd"/>' +
+      '<path d="M33 33 L40 19 H50 L48 33" fill="url(#rrGold)" ' + s + '/>' +
+      '<path d="M36 59 L28 84 Q28 89 33 89 H42 Q47 89 48 84 L51 59Z" fill="url(#rrPurple)" ' + s + '/>' +
+      '<path d="M34 64 L30 80" stroke="#c9b0ff" stroke-width="2" stroke-linecap="round"/>' +
+      '<path d="M16 46 Q16 31 32 31 H64 L75 38 V54 L64 61 H32 Q16 61 16 46Z" fill="url(#rrMagenta)" ' + s + '/>' +
+      '<path d="M22 40 Q24 35 32 35 H62" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none" opacity=".6"/>' +
+      '<rect x="74" y="39.5" width="8" height="13" rx="1.5" fill="url(#rrGold)" stroke="' + K + '" stroke-width="2.2"/>' +
+      '<circle cx="36" cy="46" r="6.5" fill="url(#rrOrb)" stroke="' + K + '" stroke-width="2.2"/>' +
+      '<path d="M50 40 H64 M50 46 H67 M50 52 H64" stroke="#7a0a40" stroke-width="2.2" stroke-linecap="round"/>'
     ),
     FLASK: svg(
-      '<path d="M43 14 V40 L22 80 Q20 88 28 88 H72 Q80 88 78 80 L57 40 V14Z" fill="#e9f3ff"/>' +
-      '<path d="M31 63 Q40 59 50 63 Q60 67 69 63 L76 80 Q78 86 72 86 H28 Q22 86 24 80Z" fill="#7CFF4F"/>' +
-      '<circle cx="43" cy="75" r="3.2" fill="#c4ffa8"/><circle cx="57" cy="70" r="2.2" fill="#c4ffa8"/><circle cx="51" cy="52" r="2.6" fill="#7CFF4F"/><circle cx="48" cy="42" r="1.8" fill="#7CFF4F"/>' +
-      '<path d="M43 14 V40 L22 80 Q20 88 28 88 H72 Q80 88 78 80 L57 40 V14" fill="none" ' + s + '/>' +
-      '<rect x="37" y="9" width="26" height="7" rx="3.5" fill="#c9d1e0" ' + s + '/>'
+      '<circle cx="50" cy="60" r="42" fill="url(#rrGlowG)" opacity=".55"/>' +
+      '<path d="M42 14 V40 L20 80 Q18 90 28 90 H72 Q82 90 80 80 L58 40 V14Z" fill="url(#rrGlass)"/>' +
+      '<path d="M30 62 Q40 57 50 62 Q60 67 70 62 L78 80 Q80 88 72 88 H28 Q20 88 22 80Z" fill="url(#rrGoo)"/>' +
+      '<circle cx="42" cy="76" r="3.6" fill="#f0ffe6" opacity=".85"/><circle cx="57" cy="70" r="2.4" fill="#f0ffe6" opacity=".85"/><circle cx="51" cy="51" r="2.8" fill="#8dff5a"/><circle cx="47" cy="41" r="2" fill="#8dff5a"/><circle cx="53" cy="32" r="1.4" fill="#8dff5a"/>' +
+      '<path d="M45 18 V42 L27 76" stroke="#fff" stroke-width="3.5" stroke-linecap="round" fill="none" opacity=".75"/>' +
+      '<path d="M42 14 V40 L20 80 Q18 90 28 90 H72 Q82 90 80 80 L58 40 V14" fill="none" ' + s + '/>' +
+      '<rect x="36" y="8" width="28" height="8" rx="4" fill="url(#rrChrome)" ' + s + '/>'
     ),
     ATOM: svg(
-      '<g fill="none" stroke="#8fe8ff" stroke-width="4.5">' +
-      '<ellipse cx="50" cy="50" rx="38" ry="13"/><ellipse cx="50" cy="50" rx="38" ry="13" transform="rotate(60 50 50)"/><ellipse cx="50" cy="50" rx="38" ry="13" transform="rotate(120 50 50)"/></g>' +
-      '<circle cx="88" cy="50" r="4.5" fill="#ff3d9a" stroke="' + K + '" stroke-width="2"/><circle cx="31" cy="17" r="4.5" fill="#ff3d9a" stroke="' + K + '" stroke-width="2"/><circle cx="31" cy="83" r="4.5" fill="#ff3d9a" stroke="' + K + '" stroke-width="2"/>' +
-      '<circle cx="50" cy="50" r="10" fill="#ffcc33" ' + s + '/>'
+      '<circle cx="50" cy="50" r="44" fill="url(#rrGlowB)" opacity=".6"/>' +
+      '<g fill="none" stroke="' + K + '" stroke-width="8"><ellipse cx="50" cy="50" rx="38" ry="13"/><ellipse cx="50" cy="50" rx="38" ry="13" transform="rotate(60 50 50)"/><ellipse cx="50" cy="50" rx="38" ry="13" transform="rotate(120 50 50)"/></g>' +
+      '<g fill="none" stroke="#7fe0ff" stroke-width="4.5"><ellipse cx="50" cy="50" rx="38" ry="13"/><ellipse cx="50" cy="50" rx="38" ry="13" transform="rotate(60 50 50)"/><ellipse cx="50" cy="50" rx="38" ry="13" transform="rotate(120 50 50)"/></g>' +
+      '<g fill="none" stroke="#e6fbff" stroke-width="1.5" opacity=".8"><ellipse cx="50" cy="49" rx="37" ry="11.5"/></g>' +
+      '<circle cx="88" cy="50" r="5" fill="url(#rrMagenta)" stroke="' + K + '" stroke-width="2"/><circle cx="31" cy="17" r="5" fill="url(#rrMagenta)" stroke="' + K + '" stroke-width="2"/><circle cx="31" cy="83" r="5" fill="url(#rrMagenta)" stroke="' + K + '" stroke-width="2"/>' +
+      '<circle cx="50" cy="50" r="15" fill="url(#rrGlowY)"/><circle cx="50" cy="50" r="10.5" fill="url(#rrNucleus)" ' + s + '/><circle cx="47" cy="47" r="3" fill="#fff" opacity=".8"/>'
     ),
     BATT: svg(
-      '<path d="M60 25 Q55 19 61 14 Q66 9 61 4" stroke="#9aa3b5" stroke-width="2.6" fill="none" stroke-linecap="round"/>' +
-      '<rect x="18" y="30" width="58" height="42" rx="6" fill="#3a2a4f" ' + s + '/>' +
-      '<rect x="76" y="43" width="8" height="16" rx="2" fill="#9aa3b5" ' + s + '/>' +
-      '<rect x="23" y="35" width="12" height="32" rx="2" fill="#ff3b3b"/>' +
-      '<path d="M54 30 L49 45 L58 51 L52 72" stroke="' + K + '" stroke-width="3" fill="none"/>' +
-      '<path d="M41 47 H47 M44 44 V50 M62 47 H69" stroke="#c9d1e0" stroke-width="2.4" stroke-linecap="round"/>'
+      '<circle cx="50" cy="52" r="42" fill="url(#rrGlowP)" opacity=".35"/>' +
+      '<path d="M60 24 Q55 18 61 13 Q66 8 61 3" stroke="#c9d1e0" stroke-width="3" fill="none" stroke-linecap="round" opacity=".8"/>' +
+      '<rect x="16" y="30" width="60" height="44" rx="7" fill="url(#rrBatt)" ' + s + '/>' +
+      '<rect x="76" y="43" width="9" height="18" rx="2.5" fill="url(#rrChrome)" ' + s + '/>' +
+      '<rect x="21" y="35" width="13" height="34" rx="2.5" fill="#ff3b3b"/><rect x="21" y="35" width="13" height="8" rx="2.5" fill="#ff9a9a" opacity=".7"/>' +
+      '<path d="M20 34 H72" stroke="#fff" stroke-width="2.5" opacity=".3" stroke-linecap="round"/>' +
+      '<path d="M54 30 L49 46 L58 52 L52 74" stroke="' + K + '" stroke-width="3" fill="none"/>' +
+      '<path d="M41 48 H47 M44 45 V51 M63 48 H70" stroke="#e6ebf5" stroke-width="2.6" stroke-linecap="round"/>'
     ),
     WILD: svg(
-      '<circle cx="50" cy="43" r="37" fill="#0d2a12" stroke="#7CFF4F" stroke-width="3"/>' +
-      '<path d="M50 43 m0 -4 a4 4 0 1 1 -4 4 a8 8 0 1 1 8 8 a12 12 0 1 1 -12 -12 a16 16 0 1 1 16 16 a21 21 0 1 1 -21 -21" stroke="#7CFF4F" stroke-width="7" opacity=".3" fill="none" stroke-linecap="round"/>' +
-      '<path d="M50 43 m0 -4 a4 4 0 1 1 -4 4 a8 8 0 1 1 8 8 a12 12 0 1 1 -12 -12 a16 16 0 1 1 16 16 a21 21 0 1 1 -21 -21" stroke="#c4ffa8" stroke-width="3" fill="none" stroke-linecap="round"/>' +
-      '<rect x="19" y="73" width="62" height="21" rx="6" fill="#ff3d9a" ' + s + '/>' +
-      '<text x="50" y="89" text-anchor="middle" font-family="Bungee, Impact, sans-serif" font-size="15" fill="#fff">WILD</text>'
+      '<circle cx="50" cy="44" r="46" fill="url(#rrGlowG)" opacity=".7"/>' +
+      '<circle cx="50" cy="42" r="37" fill="url(#rrPortal)" stroke="url(#rrGold)" stroke-width="4"/>' +
+      '<path d="M50 42 m0 -4 a4 4 0 1 1 -4 4 a8 8 0 1 1 8 8 a12 12 0 1 1 -12 -12 a16 16 0 1 1 16 16 a21 21 0 1 1 -21 -21" stroke="#eaffdd" stroke-width="3" fill="none" stroke-linecap="round" opacity=".9"/>' +
+      '<path d="M50 42 m0 -6 a6 6 0 1 1 -6 6 a10 10 0 1 1 10 10 a14 14 0 1 1 -14 -14 a19 19 0 1 1 19 19" stroke="#8dff5a" stroke-width="2" fill="none" stroke-linecap="round" opacity=".7"/>' +
+      '<path d="M15 72 L22 62 H78 L85 72 L78 96 H22Z" fill="url(#rrMagenta)" stroke="' + K + '" stroke-width="2.4" stroke-linejoin="round"/>' +
+      '<path d="M22 64 H78" stroke="#ffc2e2" stroke-width="2"/>' +
+      '<text x="50" y="90" text-anchor="middle" font-family="Bungee, Impact, sans-serif" font-size="22" fill="url(#rrGold)" stroke="' + K + '" stroke-width="1.4" paint-order="stroke">WILD</text>'
     ),
     SCAT: svg(
-      '<polygon points="50,6 85,26 85,64 50,84 15,64 15,26" fill="#2a0f3d" stroke="#ff3d9a" stroke-width="4" stroke-linejoin="round"/>' +
-      '<circle cx="50" cy="45" r="22" fill="#ff3d9a" opacity=".35"/><circle cx="50" cy="45" r="16" fill="#ff3d9a"/><circle cx="50" cy="45" r="8" fill="#ffe1f1"/>' +
-      '<path d="M30 22 L36 32 L31 34 L38 44 M70 22 L64 32 L69 34 L62 44" stroke="#ffcc33" stroke-width="2.5" fill="none" stroke-linejoin="round"/>' +
-      '<rect x="16" y="74" width="68" height="21" rx="6" fill="#ffcc33" ' + s + '/>' +
-      '<text x="50" y="90" text-anchor="middle" font-family="Bungee, Impact, sans-serif" font-size="13" fill="' + K + '">BONUS</text>'
+      '<circle cx="50" cy="46" r="46" fill="url(#rrGlowP)" opacity=".8"/>' +
+      '<polygon points="50,5 86,26 86,66 50,87 14,66 14,26" fill="url(#rrGold)" stroke="' + K + '" stroke-width="2.4" stroke-linejoin="round"/>' +
+      '<polygon points="50,12 80,30 80,62 50,80 20,62 20,30" fill="#2a0f3d"/>' +
+      '<circle cx="50" cy="46" r="22" fill="url(#rrCore)"/><circle cx="50" cy="46" r="9" fill="#fff" opacity=".85"/>' +
+      '<path d="M30 24 L37 34 L31 36 L39 46 M70 24 L63 34 L69 36 L61 46 M32 68 L40 60 M68 68 L60 60" stroke="#ffe27a" stroke-width="2.4" fill="none" stroke-linejoin="round" stroke-linecap="round"/>' +
+      '<path d="M24 32 L50 17 L76 32" stroke="#fff" stroke-width="2.5" fill="none" opacity=".35"/>' +
+      '<rect x="12" y="73" width="76" height="23" rx="7" fill="url(#rrGold)" stroke="' + K + '" stroke-width="2.4"/>' +
+      '<text x="50" y="90.5" text-anchor="middle" font-family="Bungee, Impact, sans-serif" font-size="15" fill="#3a1600">BONUS</text>'
+    ),
+    ORB: svg(
+      '<circle cx="50" cy="46" r="46" fill="url(#rrGlowB)" opacity=".8"/>' +
+      '<circle cx="50" cy="46" r="35" fill="url(#rrOrb)" stroke="' + K + '" stroke-width="2.4"/>' +
+      '<path d="M44 20 L54 38 L43 43 L58 71" stroke="#fff" stroke-width="4.5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>' +
+      '<path d="M44 20 L54 38 L43 43 L58 71" stroke="#ff7ac0" stroke-width="1.8" fill="none" stroke-linejoin="round"/>' +
+      '<path d="M27 52 Q34 46 30 38 M70 34 Q64 42 72 50" stroke="#c8f2ff" stroke-width="1.6" fill="none" opacity=".8"/>' +
+      '<ellipse cx="37" cy="29" rx="10" ry="6" fill="#fff" opacity=".65" transform="rotate(-30 37 29)"/>' +
+      '<circle cx="50" cy="46" r="35" fill="none" stroke="url(#rrGold)" stroke-width="2" opacity=".8"/>'
     ),
     COLLECTOR: svg(
-      '<path d="M22 92 Q14 70 28 64 M38 98 Q34 78 42 70 M62 98 Q66 78 58 70 M78 92 Q86 70 72 64" stroke="#9b4fe0" stroke-width="9" fill="none" stroke-linecap="round"/>' +
-      '<ellipse cx="50" cy="56" rx="30" ry="22" fill="#9b4fe0" ' + s + '/>' +
-      '<rect x="34" y="8" width="32" height="26" rx="2" fill="#111" stroke="' + K + '" stroke-width="2"/><rect x="34" y="26" width="32" height="5" fill="#e0245e"/>' +
-      '<rect x="24" y="32" width="52" height="7" rx="3.5" fill="#111" stroke="' + K + '" stroke-width="2"/>' +
-      '<circle cx="36" cy="52" r="4" fill="#ffcc33"/><circle cx="46" cy="47" r="3" fill="#ffcc33"/><circle cx="56" cy="50" r="3.5" fill="#ffcc33"/><circle cx="66" cy="55" r="3" fill="#ffcc33"/><circle cx="42" cy="61" r="2.5" fill="#ffcc33"/><circle cx="58" cy="62" r="2.5" fill="#ffcc33"/>' +
-      '<circle cx="56" cy="50" r="7.5" fill="none" stroke="#e8e3f5" stroke-width="2"/><path d="M63 53 Q68 62 64 70" stroke="#e8e3f5" stroke-width="1.5" fill="none"/>'
+      '<path d="M22 94 Q12 72 28 64 M38 99 Q32 78 42 70 M62 99 Q68 78 58 70 M78 94 Q88 72 72 64" stroke="' + K + '" stroke-width="12" fill="none" stroke-linecap="round"/>' +
+      '<path d="M22 94 Q12 72 28 64 M38 99 Q32 78 42 70 M62 99 Q68 78 58 70 M78 94 Q88 72 72 64" stroke="#9b4fe0" stroke-width="8" fill="none" stroke-linecap="round"/>' +
+      '<ellipse cx="50" cy="56" rx="30" ry="22" fill="url(#rrSquid)" ' + s + '/>' +
+      '<path d="M30 50 Q36 40 48 38" stroke="#fff" stroke-width="3" fill="none" opacity=".4" stroke-linecap="round"/>' +
+      '<rect x="34" y="7" width="32" height="27" rx="2" fill="#15101f" stroke="' + K + '" stroke-width="2"/><rect x="34" y="25" width="32" height="5" fill="url(#rrMagenta)"/>' +
+      '<rect x="37" y="9" width="5" height="16" fill="#fff" opacity=".15"/>' +
+      '<rect x="23" y="32" width="54" height="7" rx="3.5" fill="#15101f" stroke="' + K + '" stroke-width="2"/>' +
+      '<g fill="url(#rrNucleus)" stroke="' + K + '" stroke-width="1"><circle cx="36" cy="53" r="4"/><circle cx="46" cy="47" r="3"/><circle cx="56" cy="51" r="3.5"/><circle cx="66" cy="56" r="3"/><circle cx="42" cy="62" r="2.5"/><circle cx="58" cy="63" r="2.5"/></g>' +
+      '<circle cx="56" cy="51" r="7.5" fill="none" stroke="url(#rrGold)" stroke-width="2.2"/><path d="M63 54 Q68 63 64 71" stroke="url(#rrGold)" stroke-width="1.5" fill="none"/>'
     )
   };
+  ART.DEFS = DEFS;
   root.RiftArt = ART;
 })(this);
 
@@ -124,14 +244,7 @@
 (function (root) {
   'use strict';
   var K = '#1b0d2e';
-  root.RiftArt.ORB = '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
-    '<circle cx="50" cy="46" r="42" fill="#3ad7ff" opacity=".22"/>' +
-    '<circle cx="50" cy="46" r="34" fill="#2b5cff" stroke="' + K + '" stroke-width="3"/>' +
-    '<circle cx="50" cy="46" r="25" fill="#5fd0ff"/>' +
-    '<path d="M44 22 L54 40 L44 44 L58 70" stroke="#fff" stroke-width="4" fill="none" stroke-linejoin="round" stroke-linecap="round"/>' +
-    '<path d="M44 22 L54 40 L44 44 L58 70" stroke="#ff3d9a" stroke-width="1.6" fill="none" stroke-linejoin="round"/>' +
-    '<ellipse cx="38" cy="30" rx="8" ry="5" fill="#fff" opacity=".6" transform="rotate(-30 38 30)"/>' +
-    '</svg>';
+
 
   function stars(n, seed, w, h) {
     var out = '', x = seed;
