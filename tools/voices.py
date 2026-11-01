@@ -11,7 +11,7 @@ SR = 24000
 # voice, speed, lang, ffmpeg effect chain (pitch via asetrate keeps the tempo with atempo)
 def pitch(r): return 'rubberband=pitch=%.3f:formant=shifted:transients=smooth' % r
 CAST = {
-    'VEX':       ('am_onyx', 1.12, 'en-us', pitch(0.9) + ',acompressor=threshold=0.1:ratio=3'),
+    'VEX':       ('am_michael', 1.05, 'en-us', 'acompressor=threshold=0.2:ratio=2'),
     'DEX':       ('am_puck', 1.18, 'en-us', pitch(1.12)),
     'GLORP':     ('am_echo', 1.08, 'en-us', pitch(1.32) + ',vibrato=f=7:d=0.35'),
     'B12':       ('am_michael', 1.0, 'en-us', 'aecho=0.8:0.85:7:0.45,flanger=delay=1:depth=2:speed=0.4'),
@@ -59,7 +59,7 @@ def clause(char, text):
         t1 = min(len(raw(char, upto)), full)
         t0 = int(t0 * 0.97); t1 = min(full, int(t1 * 1.02))
         if t1 - t0 < SR * 0.08: continue
-        seg = ffx(a[t0:t1], 'rubberband=tempo=0.82:pitch=1.07:transients=smooth,volume=1.6')
+        seg = ffx(a[t0:t1], 'rubberband=tempo=0.93:transients=smooth,volume=1.3')
         x = int(SR * 0.015); r = np.linspace(0, 1, x, dtype=np.float32)
         seg[:x] *= r; seg[-x:] *= r[::-1]
         a = np.concatenate([a[:t0], seg, a[t1:]])
