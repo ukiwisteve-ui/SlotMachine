@@ -25,28 +25,56 @@ for kind, body in re.findall(r"(\w+): \[(.*?)\]\],?\n", quips):
     for c, t in re.findall(r"\['(\w+)', '((?:[^'\\]|\\.)*)'\]", body + ']'):
         order.append((c, t.replace("\\'", "'"), kind))
 
-def tighten(a, max_gap=0.2, edge=0.03, thresh=0.012):
-    """Kokoro leaves long pauses at every full stop. Shorten any quiet run to max_gap and trim the ends."""
+def trim(a, edge=0.02, thresh=0.01):
     win = int(SR * 0.01)
     rms = np.sqrt(np.convolve(a ** 2, np.ones(win) / win, 'same'))
-    loud = rms > thresh
-    idx = np.flatnonzero(loud)
+    idx = np.flatnonzero(rms > thresh)
     if not len(idx): return a
-    a, loud = a[max(0, idx[0] - int(SR * edge)): idx[-1] + int(SR * edge)], loud[max(0, idx[0] - int(SR * edge)): idx[-1] + int(SR * edge)]
-    out, i, n, keep = [], 0, len(a), int(SR * max_gap)
-    while i < n:
-        j = i
-        while j < n and loud[j] == loud[i]: j += 1
-        seg = a[i:j]
-        if not loud[i] and len(seg) > keep:  # keep the gap's two ends so words don't get clipped
-            h = keep // 2; seg = np.concatenate([seg[:h], seg[-h:]])
-        out.append(seg); i = j
-    return np.concatenate(out)
+    return a[max(0, idx[0] - int(SR * edge)): idx[-1] + int(SR * edge)]
+
+def ffx(a, chain):
+    with tempfile.NamedTemporaryFile(suffix='.wav') as i, tempfile.NamedTemporaryFile(suffix='.wav') as o:
+        sf.write(i.name, a, SR)
+        subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', i.name, '-af', chain, '-ar', str(SR), o.name], check=True)
+        return sf.read(o.name, dtype='float32')[0]
+
+def raw(char, text):
+    v, sp, lang, _ = CAST[char]
+    return trim(k.create(text, voice=v, speed=sp, lang=lang)[0])
+
+PAUSE = {'.': 0.36, '!': 0.36, '?': 0.4, ',': 0.2, ';': 0.25, ':': 0.25}
+EMPH = re.compile(r'"([^"]+)"|\b([A-Z]{2,})\b')
+
+def clause(char, text):
+    """Speak one clause; stretch, lift and brighten its emphasised words (CAPS or "quoted")."""
+    words = [(m.start(), m.end(), m.group(1) or m.group(2)) for m in EMPH.finditer(text)]
+    spoken = EMPH.sub(lambda m: (m.group(1) or m.group(2)).lower(), text)
+    a = raw(char, spoken)
+    if not words: return a
+    full = len(a)
+    for st, en, w in reversed(words):  # find each word's position from how long the lead-in takes on its own
+        before = EMPH.sub(lambda m: (m.group(1) or m.group(2)).lower(), text[:st]).strip()
+        upto = (before + ' ' + w.lower()).strip()
+        t0 = len(raw(char, before)) if before else 0
+        t1 = min(len(raw(char, upto)), full)
+        t0 = int(t0 * 0.97); t1 = min(full, int(t1 * 1.02))
+        if t1 - t0 < SR * 0.08: continue
+        seg = ffx(a[t0:t1], 'rubberband=tempo=0.82:pitch=1.07:transients=smooth,volume=1.6')
+        x = int(SR * 0.015); r = np.linspace(0, 1, x, dtype=np.float32)
+        seg[:x] *= r; seg[-x:] *= r[::-1]
+        a = np.concatenate([a[:t0], seg, a[t1:]])
+        full = len(a)
+    return a
 
 def tts(char, text):
-    v, sp, lang, _ = CAST[char]
-    s, sr = k.create(text, voice=v, speed=sp, lang=lang)
-    return tighten(s)
+    out = []
+    for m in re.finditer(r'[^.!?,;:]+[.!?,;:"]*', text):
+        piece = m.group(0).strip()
+        if not piece.strip('.!?,;:" '): continue
+        out.append(clause(char, piece))
+        p = re.findall(r'[.!?,;:]', piece)
+        out.append(np.zeros(int(SR * PAUSE.get(p[-1], 0.15) if p else SR * 0.15), np.float32))
+    return np.concatenate(out[:-1]) if out else np.zeros(1, np.float32)
 
 def bleep(sec=0.32):
     t = np.arange(int(SR * sec)) / SR
