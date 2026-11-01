@@ -9,14 +9,14 @@ KD = os.environ.get('KOKORO_DIR', '/tmp/kokoro')
 k = Kokoro(os.path.join(KD, 'kokoro-v1.0.onnx'), os.path.join(KD, 'voices-v1.0.bin'))
 SR = 24000
 # voice, speed, lang, ffmpeg effect chain (pitch via asetrate keeps the tempo with atempo)
-def pitch(r): return 'asetrate=%d,aresample=%d,atempo=%.4f' % (SR * r, SR, 1 / r)
+def pitch(r): return 'rubberband=pitch=%.3f:formant=shifted:transients=smooth' % r
 CAST = {
-    'VEX':       ('am_onyx', 1.08, 'en-us', pitch(0.9) + ',acompressor=threshold=0.1:ratio=3'),
-    'DEX':       ('am_puck', 1.12, 'en-us', pitch(1.12)),
-    'GLORP':     ('am_echo', 1.0, 'en-us', pitch(1.32) + ',vibrato=f=7:d=0.35'),
-    'B12':       ('am_michael', 0.92, 'en-us', 'aecho=0.8:0.85:7:0.45,flanger=delay=1:depth=2:speed=0.4'),
-    'FIZZ':      ('bm_daniel', 1.0, 'en-gb', 'highpass=f=280,lowpass=f=3600'),
-    'COLLECTOR': ('bm_george', 0.86, 'en-gb', pitch(0.94)),
+    'VEX':       ('am_onyx', 1.12, 'en-us', pitch(0.9) + ',acompressor=threshold=0.1:ratio=3'),
+    'DEX':       ('am_puck', 1.18, 'en-us', pitch(1.12)),
+    'GLORP':     ('am_echo', 1.08, 'en-us', pitch(1.32) + ',vibrato=f=7:d=0.35'),
+    'B12':       ('am_michael', 1.0, 'en-us', 'aecho=0.8:0.85:7:0.45,flanger=delay=1:depth=2:speed=0.4'),
+    'FIZZ':      ('bm_daniel', 1.08, 'en-gb', 'highpass=f=280,lowpass=f=3600'),
+    'COLLECTOR': ('bm_george', 0.95, 'en-gb', pitch(0.94)),
 }
 src = open('www/index.html').read()
 quips = re.search(r'var QUIPS = (\{.*?\n\});', src, re.S).group(1)
@@ -25,10 +25,28 @@ for kind, body in re.findall(r"(\w+): \[(.*?)\]\],?\n", quips):
     for c, t in re.findall(r"\['(\w+)', '((?:[^'\\]|\\.)*)'\]", body + ']'):
         order.append((c, t.replace("\\'", "'"), kind))
 
+def tighten(a, max_gap=0.2, edge=0.03, thresh=0.012):
+    """Kokoro leaves long pauses at every full stop. Shorten any quiet run to max_gap and trim the ends."""
+    win = int(SR * 0.01)
+    rms = np.sqrt(np.convolve(a ** 2, np.ones(win) / win, 'same'))
+    loud = rms > thresh
+    idx = np.flatnonzero(loud)
+    if not len(idx): return a
+    a, loud = a[max(0, idx[0] - int(SR * edge)): idx[-1] + int(SR * edge)], loud[max(0, idx[0] - int(SR * edge)): idx[-1] + int(SR * edge)]
+    out, i, n, keep = [], 0, len(a), int(SR * max_gap)
+    while i < n:
+        j = i
+        while j < n and loud[j] == loud[i]: j += 1
+        seg = a[i:j]
+        if not loud[i] and len(seg) > keep:  # keep the gap's two ends so words don't get clipped
+            h = keep // 2; seg = np.concatenate([seg[:h], seg[-h:]])
+        out.append(seg); i = j
+    return np.concatenate(out)
+
 def tts(char, text):
     v, sp, lang, _ = CAST[char]
     s, sr = k.create(text, voice=v, speed=sp, lang=lang)
-    return s
+    return tighten(s)
 
 def bleep(sec=0.32):
     t = np.arange(int(SR * sec)) / SR
