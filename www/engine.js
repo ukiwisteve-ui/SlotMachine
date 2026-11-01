@@ -14,7 +14,8 @@
     RAY:   { name: 'Ray Gun',       kind: 'low' },
     FLASK: { name: 'Goo Flask',     kind: 'low' },
     ATOM:  { name: 'Atom',          kind: 'low' },
-    BATT:  { name: 'Dead Battery',  kind: 'low' }
+    BATT:  { name: 'Dead Battery',  kind: 'low' },
+    ORB:   { name: 'Plasma Orb',    kind: 'orb' }
   };
 
   // Line pays as multiples of the line bet, for 3, 4 and 5 of a kind.
@@ -36,7 +37,7 @@
 
   var FREE_SPIN_MULT = 2;      // every free-spin win pays 2x
   var COLLECTOR_MULT = 3;      // wins through The Collector's wild reel pay 3x instead
-  var COLLECTOR_CHANCE = 0.28; // chance per free spin that The Collector appears
+  var COLLECTOR_CHANCE = 0.24; // chance per free spin that The Collector appears
 
   // Symbol counts on each reel strip (reels 1 to 5).
   var COUNTS = {
@@ -52,6 +53,9 @@
     WILD:  [0, 2, 2, 2, 0],
     SCAT:  [1, 2, 2, 2, 1]
   };
+
+  // Plasma Orbs sit on the strips in stacks of 3 so they can fill whole reels.
+  var ORB_STACKS = [1, 1, 1, 1, 1];
 
   // 20 fixed paylines: row index (0 top, 1 middle, 2 bottom) on each reel.
   var LINES = [
@@ -92,7 +96,7 @@
         for (var k = 0; k < strip.length; k++) {
           var a = strip[k], b = strip[(k + 1) % strip.length], c = strip[(k + 2) % strip.length];
           var special = (a === 'SCAT' || a === 'WILD');
-          if (a === b || (special && (c === 'SCAT' || c === 'WILD'))) {
+          if ((a === b && a !== 'ORB') || (special && (c === 'SCAT' || c === 'WILD'))) {
             var m = Math.floor(rand() * strip.length);
             var tmp = strip[(k + 1) % strip.length];
             strip[(k + 1) % strip.length] = strip[m]; strip[m] = tmp;
@@ -100,6 +104,12 @@
           }
         }
         if (fixed) break;
+      }
+      // Insert the orb stacks at evenly spaced points.
+      var gap = Math.floor(strip.length / ORB_STACKS[r]);
+      for (var q = ORB_STACKS[r] - 1; q >= 0; q--) {
+        var at = Math.floor(q * gap + gap / 2);
+        strip.splice(at, 0, 'ORB', 'ORB', 'ORB');
       }
       strips.push(strip);
     }
@@ -129,7 +139,7 @@
     if (w >= 3) best = { pay: PAYS.WILD[w - 3], count: w, symbol: 'WILD' };
     var first = null;
     for (var i = 0; i < 5; i++) {
-      if (syms[i] === 'SCAT') break;
+      if (syms[i] === 'SCAT' || syms[i] === 'ORB') break;
       if (syms[i] !== 'WILD') { first = syms[i]; break; }
     }
     if (first) {
@@ -174,6 +184,47 @@
              freeSpins: freeSpins, total: total, totalBet: totalBet, collectorReel: cr };
   }
 
+
+  /* ---------- Orb Lockdown (hold and spin) ----------
+     6 or more Plasma Orbs on a base spin lock in place and the player gets 3 respins.
+     Every new orb that lands locks too and resets the respins to 3.
+     Each orb carries a prize: a multiple of the total bet, or a Minor, Major or Grand jackpot.
+     Filling all 15 spaces also wins the Jackpot. */
+  var ORB_TRIGGER = 6;
+  var ORB_RESPINS = 3;
+  var ORB_LAND_CHANCE = 0.045;   // chance per empty space per respin that an orb lands
+  var JACKPOTS = { MINOR: 25, MAJOR: 100, GRAND: 500, JACKPOT: 2000 }; // multiples of total bet
+  var ORB_VALUES = [            // [prize, weight]
+    [1, 300], [2, 250], [3, 160], [5, 100], [10, 40], ['MINOR', 15], ['MAJOR', 4], ['GRAND', 1]
+  ];
+  var ORB_WEIGHT = ORB_VALUES.reduce(function (a, v) { return a + v[1]; }, 0);
+  function orbValue(rand) {
+    var x = (rand || Math.random)() * ORB_WEIGHT;
+    for (var i = 0; i < ORB_VALUES.length; i++) { x -= ORB_VALUES[i][1]; if (x < 0) return ORB_VALUES[i][0]; }
+    return 1;
+  }
+  function orbMultiple(v) { return typeof v === 'number' ? v : JACKPOTS[v]; }
+
+  // Plays a whole lockdown round. cells: 15 entries (index reel*3+row), null or a prize.
+  // Returns every respin step so the screen can replay it, plus the total in multiples of total bet.
+  function playLockdown(cells, rand) {
+    rand = rand || Math.random;
+    cells = cells.slice();
+    var respins = ORB_RESPINS, steps = [];
+    while (respins > 0 && cells.some(function (c) { return c === null; })) {
+      var landed = [];
+      for (var i = 0; i < 15; i++) {
+        if (cells[i] === null && rand() < ORB_LAND_CHANCE) { cells[i] = orbValue(rand); landed.push(i); }
+      }
+      respins = landed.length ? ORB_RESPINS : respins - 1;
+      steps.push({ landed: landed, cells: cells.slice(), respins: respins });
+    }
+    var full = cells.every(function (c) { return c !== null; });
+    var total = cells.reduce(function (a, c) { return a + (c === null ? 0 : orbMultiple(c)); }, 0);
+    if (full) total += JACKPOTS.JACKPOT;
+    return { steps: steps, cells: cells, full: full, totalMultiple: total };
+  }
+
   // One complete spin, including deciding whether The Collector appears.
   function spin(opts, rand) {
     rand = rand || Math.random;
@@ -184,6 +235,15 @@
     var res = evaluate(grid, { lineBet: opts.lineBet, free: opts.free, collectorReel: cr });
     res.stops = stops;
     res.rawGrid = grid;
+    // Give every orb on screen a prize; 6 or more in the base game start Orb Lockdown.
+    res.orbs = [];
+    var orbCount = 0;
+    for (var r = 0; r < 5; r++) for (var row = 0; row < 3; row++) {
+      var v = grid[r][row] === 'ORB' ? orbValue(rand) : null;
+      if (v !== null) orbCount++;
+      res.orbs.push(v);
+    }
+    res.lockdown = !opts.free && orbCount >= ORB_TRIGGER;
     return res;
   }
 
@@ -192,7 +252,9 @@
     FREE_SPIN_MULT: FREE_SPIN_MULT, COLLECTOR_MULT: COLLECTOR_MULT, COLLECTOR_CHANCE: COLLECTOR_CHANCE,
     LINES: LINES, STRIPS: STRIPS, BET_LEVELS: BET_LEVELS,
     gridFromStops: gridFromStops, randomStops: randomStops, evaluate: evaluate, evalLine: evalLine,
-    spin: spin, mulberry32: mulberry32
+    spin: spin, mulberry32: mulberry32,
+    ORB_TRIGGER: ORB_TRIGGER, ORB_RESPINS: ORB_RESPINS, JACKPOTS: JACKPOTS, ORB_VALUES: ORB_VALUES,
+    orbValue: orbValue, orbMultiple: orbMultiple, playLockdown: playLockdown
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.RiftEngine = api;

@@ -119,3 +119,80 @@
   };
   root.RiftArt = ART;
 })(this);
+
+/* Plasma Orb symbol and the three background scenes (garage, rift dimension, containment lab). */
+(function (root) {
+  'use strict';
+  var K = '#1b0d2e';
+  root.RiftArt.ORB = '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
+    '<circle cx="50" cy="46" r="42" fill="#3ad7ff" opacity=".22"/>' +
+    '<circle cx="50" cy="46" r="34" fill="#2b5cff" stroke="' + K + '" stroke-width="3"/>' +
+    '<circle cx="50" cy="46" r="25" fill="#5fd0ff"/>' +
+    '<path d="M44 22 L54 40 L44 44 L58 70" stroke="#fff" stroke-width="4" fill="none" stroke-linejoin="round" stroke-linecap="round"/>' +
+    '<path d="M44 22 L54 40 L44 44 L58 70" stroke="#ff3d9a" stroke-width="1.6" fill="none" stroke-linejoin="round"/>' +
+    '<ellipse cx="38" cy="30" rx="8" ry="5" fill="#fff" opacity=".6" transform="rotate(-30 38 30)"/>' +
+    '</svg>';
+
+  function stars(n, seed, w, h) {
+    var out = '', x = seed;
+    function r() { x = (x * 9301 + 49297) % 233280; return x / 233280; }
+    for (var i = 0; i < n; i++) out += '<circle cx="' + (r() * w).toFixed(1) + '" cy="' + (r() * h).toFixed(1) + '" r="' + (0.6 + r() * 1.4).toFixed(1) + '" fill="#fff" opacity="' + (0.3 + r() * 0.6).toFixed(2) + '"/>';
+    return out;
+  }
+  var open = '<svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">';
+
+  var garage = open +
+    '<defs><linearGradient id="scG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a1645"/><stop offset="1" stop-color="#120722"/></linearGradient>' +
+    '<pattern id="scPeg" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1.6" fill="#ffffff16"/></pattern></defs>' +
+    '<rect width="400" height="800" fill="url(#scG)"/><rect width="400" height="620" fill="url(#scPeg)"/>' +
+    // left shelf with glowing jars
+    '<rect x="-10" y="190" width="110" height="8" fill="#4a2f6b"/>' +
+    '<rect x="8" y="160" width="18" height="30" rx="3" fill="#7cff4f" opacity=".55"/><rect x="34" y="150" width="22" height="40" rx="3" fill="#ff3d9a" opacity=".45"/><rect x="64" y="166" width="16" height="24" rx="3" fill="#3ad7ff" opacity=".5"/>' +
+    '<circle cx="17" cy="175" r="22" fill="#7cff4f" opacity=".08"/><circle cx="45" cy="170" r="26" fill="#ff3d9a" opacity=".07"/>' +
+    // right shelf
+    '<rect x="300" y="340" width="120" height="8" fill="#4a2f6b"/>' +
+    '<rect x="312" y="304" width="24" height="36" rx="4" fill="#7cff4f" opacity=".5"/><rect x="344" y="316" width="16" height="24" rx="3" fill="#ffcc33" opacity=".45"/><rect x="368" y="296" width="20" height="44" rx="3" fill="#3ad7ff" opacity=".45"/>' +
+    '<circle cx="324" cy="322" r="28" fill="#7cff4f" opacity=".07"/>' +
+    // hanging tools
+    '<path d="M330 90 l0 40 m-8 0 h16 l-3 30 h-10z" stroke="#ffffff22" stroke-width="4" fill="none"/>' +
+    '<path d="M40 420 q10 -20 20 0 l-4 70 h-12z" fill="#ffffff12"/>' +
+    // hanging bulb
+    '<path d="M70 0 V58" stroke="#ffffff30" stroke-width="2"/><circle cx="70" cy="66" r="9" fill="#ffe9a8"/><circle cx="70" cy="66" r="40" fill="#ffcc33" opacity=".08"/>' +
+    // workbench and goo puddle
+    '<rect x="0" y="640" width="400" height="160" fill="#1a0d2b"/><rect x="0" y="634" width="400" height="10" fill="#4a2f6b"/>' +
+    '<ellipse cx="300" cy="700" rx="70" ry="12" fill="#7cff4f" opacity=".25"/><ellipse cx="300" cy="700" rx="40" ry="6" fill="#7cff4f" opacity=".35"/>' +
+    '</svg>';
+
+  var rift = open +
+    '<defs><linearGradient id="scR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#062f3a"/><stop offset=".55" stop-color="#3a0b4a"/><stop offset="1" stop-color="#12051f"/></linearGradient></defs>' +
+    '<rect width="400" height="800" fill="url(#scR)"/>' + stars(90, 7, 400, 560) +
+    '<g class="swirl">' +
+      '<ellipse cx="200" cy="400" rx="260" ry="260" fill="none" stroke="#7cff4f" stroke-width="30" opacity=".05"/>' +
+      '<ellipse cx="200" cy="400" rx="190" ry="190" fill="none" stroke="#7cff4f" stroke-width="22" stroke-dasharray="80 40" opacity=".09"/>' +
+      '<ellipse cx="200" cy="400" rx="120" ry="120" fill="none" stroke="#c4ffa8" stroke-width="14" stroke-dasharray="50 30" opacity=".12"/>' +
+    '</g>' +
+    '<circle cx="330" cy="150" r="88" fill="#ff7ad1"/><path d="M246 130 Q330 110 414 140 M248 170 Q330 150 412 178" stroke="#c94aa0" stroke-width="10" fill="none" opacity=".6"/>' +
+    '<ellipse cx="330" cy="150" rx="150" ry="26" fill="none" stroke="#ffd36b" stroke-width="6" transform="rotate(-14 330 150)" opacity=".85"/>' +
+    '<circle cx="62" cy="96" r="28" fill="#9ff7e8"/><circle cx="54" cy="90" r="6" fill="#6fd8c8"/><circle cx="72" cy="106" r="4" fill="#6fd8c8"/>' +
+    '<g class="bob"><rect x="40" y="300" width="26" height="26" fill="#7cff4f" opacity=".7" transform="rotate(20 53 313)"/></g>' +
+    '<g class="bob slow"><rect x="340" y="420" width="20" height="20" fill="#3fd0c0" opacity=".7" transform="rotate(-25 350 430)"/></g>' +
+    '<g class="bob"><rect x="300" y="560" width="14" height="14" fill="#ffcc33" opacity=".6" transform="rotate(35 307 567)"/></g>' +
+    '<path d="M0 690 Q60 650 120 680 T240 670 T400 660 V800 H0Z" fill="#1b0a2e"/>' +
+    '<polygon points="30,690 44,610 58,690" fill="#3fd0c0" opacity=".85"/><polygon points="52,690 62,640 72,690" fill="#ff3d9a" opacity=".8"/>' +
+    '<polygon points="330,672 346,590 362,672" fill="#ff3d9a" opacity=".8"/><polygon points="356,670 368,620 380,670" fill="#3fd0c0" opacity=".85"/>' +
+    '</svg>';
+
+  var lock = open +
+    '<defs><pattern id="scGrid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#5fd0ff" stroke-opacity=".08" stroke-width="1"/></pattern>' +
+    '<pattern id="scHaz" width="28" height="28" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="14" height="28" fill="#ffcc33"/><rect x="14" width="14" height="28" fill="#111"/></pattern></defs>' +
+    '<rect width="400" height="800" fill="#0a1018"/><rect width="400" height="800" fill="url(#scGrid)"/>' +
+    '<rect x="0" y="0" width="400" height="34" fill="url(#scHaz)"/><rect x="0" y="766" width="400" height="34" fill="url(#scHaz)"/>' +
+    '<rect x="6" y="34" width="14" height="732" fill="#26313d"/><rect x="380" y="34" width="14" height="732" fill="#26313d"/>' +
+    '<rect x="4" y="200" width="18" height="10" fill="#3a4757"/><rect x="4" y="520" width="18" height="10" fill="#3a4757"/><rect x="378" y="300" width="18" height="10" fill="#3a4757"/><rect x="378" y="620" width="18" height="10" fill="#3a4757"/>' +
+    '<g class="alarm"><circle cx="40" cy="60" r="70" fill="#ff2a2a" opacity=".22"/><circle cx="40" cy="60" r="12" fill="#ff4d4d"/></g>' +
+    '<g class="alarm late"><circle cx="360" cy="60" r="70" fill="#ff2a2a" opacity=".22"/><circle cx="360" cy="60" r="12" fill="#ff4d4d"/></g>' +
+    '<text x="200" y="740" text-anchor="middle" font-family="Bungee, Impact, sans-serif" font-size="16" fill="#ffcc33" opacity=".5" letter-spacing="4">CONTAINMENT BREACH</text>' +
+    '</svg>';
+
+  root.RiftScenes = { garage: garage, rift: rift, lock: lock };
+})(this);

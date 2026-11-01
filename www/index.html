@@ -25,9 +25,10 @@
   --body: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
   --cell: 64px;
 }
-body.dim-1 { --void: #06200f; --void-2: #0f4a22; }  /* goo swamp */
-body.dim-2 { --void: #08162e; --void-2: #123a6b; }  /* cube world */
-body.dim-3 { --void: #2e0818; --void-2: #6b1240; }  /* giant-baby planet */
+/* Free spins: the rift dimension. Glassy teal cabinet. */
+body.free { --void: #062f3a; --void-2: #3a0b4a; --panel: #052a3388; --panel-2: #0b4a5799; --line: rgba(140,255,240,.2); }
+/* Orb Lockdown: containment lab. Steel cabinet with hazard stripes. */
+body.lock { --void: #0a1018; --void-2: #1d2a38; --panel: #1a222c; --panel-2: #26313d; --line: rgba(255,204,51,.22); }
 
 html, body { height: 100%; }
 [hidden] { display: none !important; }
@@ -121,7 +122,8 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   display: none; font-family: var(--display); font-size: 15px; color: #000; background: var(--goo);
   border-radius: 8px; padding: 3px 10px; margin-top: 6px;
 }
-body.free .fs-banner { display: inline-block; }
+body.free .fs-banner, body.lock .fs-banner { display: inline-block; }
+body.lock .fs-banner { background: var(--gold); }
 body.free .marquee h1 { color: var(--hot); text-shadow: 0 0 10px #ff3d9a99, 3px 3px 0 var(--goo), 5px 5px 0 #000; }
 
 /* Reels */
@@ -209,6 +211,59 @@ body.free .spin { background: radial-gradient(circle at 40% 30%, #d6ffc4, var(--
 .bottom button.ready { border-color: var(--gold); color: var(--gold); animation: glow 1.2s ease-in-out infinite alternate; }
 @keyframes glow { to { box-shadow: 0 0 14px #ffcc3388; } }
 
+/* Background scenes */
+.scene { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.scene > div { position: absolute; inset: 0; opacity: 0; transition: opacity .9s; }
+.scene svg { width: 100%; height: 100%; display: block; }
+body:not(.free):not(.lock) .sc-garage, body.free:not(.lock) .sc-rift, body.lock .sc-lock { opacity: 1; }
+body.dim-2 .sc-rift { filter: hue-rotate(70deg); }
+body.dim-3 .sc-rift { filter: hue-rotate(-60deg) saturate(1.2); }
+.swirl { transform-origin: 200px 400px; animation: swirl 30s linear infinite; }
+@keyframes swirl { to { transform: rotate(360deg); } }
+.bob { transform-box: fill-box; animation: bob 3.5s ease-in-out infinite alternate; }
+.bob.slow { animation-duration: 5s; }
+@keyframes bob { to { transform: translateY(-18px); } }
+.alarm { animation: alarm 1s steps(2) infinite; }
+.alarm.late { animation-delay: .5s; }
+@keyframes alarm { 50% { opacity: .15; } }
+body.free .cabinet { backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); box-shadow: inset 0 0 0 2px #8cfff033, 0 0 34px #3fffe044; }
+body.lock .cabinet {
+  border: 6px solid transparent;
+  background: linear-gradient(180deg, var(--panel-2), var(--panel)) padding-box, repeating-linear-gradient(45deg, var(--gold) 0 12px, #111 12px 24px) border-box;
+}
+body.lock .marquee h1 { color: var(--gold); text-shadow: 0 0 10px #ff2a2a99, 3px 3px 0 #b3121f, 5px 5px 0 #000; }
+body.lock .reelwrap { box-shadow: 0 0 0 3px #000, 0 0 30px #ff2a2a88; }
+body.lock .reels { visibility: hidden; }
+body.lock .spin { background: radial-gradient(circle at 40% 30%, #ffe9a8, var(--gold) 55%, #a87900); box-shadow: 0 6px 0 #6b4d00, 0 0 22px #ffcc3388; font-size: 14px; }
+
+/* Jackpot plaques */
+.jackpots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; width: 100%; }
+.jp { border-radius: 10px; padding: 3px 2px; text-align: center; border: 2px solid #000; color: #fff; min-width: 0; }
+.jp span { display: block; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; opacity: .9; }
+.jp b { display: block; font-family: var(--display); font-weight: 400; font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.jp.MINOR { background: #2f7d1e; } .jp.MAJOR { background: #1f5fb8; } .jp.GRAND { background: #b8217a; }
+.jp.JACKPOT { background: linear-gradient(180deg, #ffe27a, #ffb700); color: #2a1600; }
+.jp.hit { animation: jphit .3s 8 alternate; }
+@keyframes jphit { to { transform: scale(1.12); box-shadow: 0 0 18px #fff; } }
+
+/* Orb prize labels */
+.val { position: absolute; left: 50%; bottom: 8%; transform: translateX(-50%); font-family: var(--display); font-size: calc(var(--cell) * .21); line-height: 1; color: #fff; white-space: nowrap; text-shadow: 0 0 3px #000, 1px 1px 0 #000, -1px -1px 0 #000; pointer-events: none; }
+.val.MINOR { color: #9dff7a; } .val.MAJOR { color: #8fd0ff; } .val.GRAND { color: #ff8cd0; }
+.val.MINOR, .val.MAJOR, .val.GRAND { font-size: calc(var(--cell) * .17); }
+
+/* Lockdown grid */
+.lockgrid { position: absolute; inset: 11px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 4px; }
+.lc { background: #0d1520; border: 2px solid #2c3a4a; border-radius: 8px; position: relative; display: grid; place-items: center; overflow: hidden; }
+.lc svg { position: absolute; inset: 8%; width: 84%; height: 84%; }
+.lc.roll::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, #5fd0ff22 0 5px, transparent 5px 10px); animation: scan .2s linear infinite; }
+@keyframes scan { to { background-position: 0 10px; } }
+.lc.locked { background: radial-gradient(circle, #1d4f8c, #0d1520 72%); border-color: #5fd0ff; box-shadow: inset 0 0 12px #5fd0ff77; }
+.lc.new svg { animation: slam .45s cubic-bezier(.2,1.8,.4,1); }
+@keyframes slam { from { transform: scale(2.2); opacity: 0; } }
+.lc.collect { border-color: var(--gold); box-shadow: inset 0 0 18px var(--gold), 0 0 12px var(--gold); }
+.lc.collected { opacity: .55; }
+.reel.tease { box-shadow: inset 0 0 0 3px var(--hot), inset 0 0 22px var(--hot); }
+
 /* Modals */
 .modal { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; background: #05010dcc; padding: 16px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 .sheet {
@@ -275,16 +330,18 @@ select { background: var(--panel); color: var(--ink); border: 2px solid var(--li
 @keyframes drop { from { transform: translate(-50%, -20px); opacity: 0; } }
 
 @media (max-height: 640px) {
-  .marquee small { display: none; }
   .marquee h1 { font-size: 24px; }
   .quip { min-height: 44px; } .quip .face { width: 38px; height: 38px; }
   .spin { width: 76px; height: 76px; font-size: 18px; }
   .bubble { font-size: 13px; padding: 5px 9px; }
 }
 @media (prefers-reduced-motion: reduce) {
+  .swirl, .bob, .alarm, .lc.roll::after,
   .marquee::before, .cell.win svg, .bottom button.ready { animation: none; }
 }
 </style>
+
+<div class="scene" id="scene"><div class="sc-garage"></div><div class="sc-rift"></div><div class="sc-lock"></div></div>
 
 <div class="app" id="app">
   <div class="topbar">
@@ -308,13 +365,20 @@ select { background: var(--panel); color: var(--ink); border: 2px solid var(--li
   <div class="cabinet">
     <div class="marquee">
       <h1>RIFT RICHES</h1>
-      <small>20 lines · Rift Run free spins</small>
       <div class="fs-banner" id="fsBanner">RIFT RUN · 10 LEFT</div>
+    </div>
+
+    <div class="jackpots" aria-label="Jackpots at your current bet">
+      <div class="jp MINOR" id="jpMINOR"><span>Minor</span><b>0</b></div>
+      <div class="jp MAJOR" id="jpMAJOR"><span>Major</span><b>0</b></div>
+      <div class="jp GRAND" id="jpGRAND"><span>Grand</span><b>0</b></div>
+      <div class="jp JACKPOT" id="jpJACKPOT"><span>Jackpot</span><b>0</b></div>
     </div>
 
     <div class="reelwrap" id="reelwrap">
       <div class="reels" id="reels"></div>
       <svg class="paylines" id="paylines" viewBox="0 0 500 300" preserveAspectRatio="none"></svg>
+      <div class="lockgrid" id="lockgrid" hidden></div>
     </div>
 
     <div class="quip" id="quip">
@@ -323,7 +387,7 @@ select { background: var(--panel); color: var(--ink); border: 2px solid var(--li
     </div>
 
     <div class="meter">
-      <div><label for="winOut">Win</label><output id="winOut">0</output></div>
+      <div><label for="winOut" id="winLbl">Win</label><output id="winOut">0</output></div>
       <div><label for="totalBetOut">Total bet</label><output id="totalBetOut">100</output></div>
     </div>
 
@@ -372,7 +436,7 @@ select { background: var(--panel); color: var(--ink); border: 2px solid var(--li
       <select id="setRemind"><option value="0">Off</option><option value="30">30 minutes</option><option value="60">1 hour</option><option value="120">2 hours</option></select>
     </div>
     <h3>About</h3>
-    <p class="note">Rift Riches is for players aged 18 and over. Coins have no cash value and can never be withdrawn or exchanged for prizes. Prototype 0.1, test mode: purchases are free.</p>
+    <p class="note">Rift Riches is for players aged 18 and over. Coins have no cash value and can never be withdrawn or exchanged for prizes. Prototype 0.2, test mode: purchases are free.</p>
     <div class="actions">
       <button class="btn alt" id="openPay2">Paytable and rules</button>
       <button class="btn alt" id="resetBtn">Reset progress</button>
@@ -400,7 +464,8 @@ select { background: var(--panel); color: var(--ink); border: 2px solid var(--li
     <h3>Rules</h3>
     <p>Wins pay left to right on 20 fixed lines, starting from the first reel. Only the highest win on each line is paid. The Rift wild lands on reels 2, 3 and 4 and stands in for every symbol except the Quantum Core.</p>
     <p>Three or more Quantum Cores anywhere pay a multiple of your total bet and start a Rift Run: 10, 15 or 25 free spins where every win pays double. On each free spin The Collector may grab a reel and turn it fully wild, and wins through that reel pay triple. Cores during a run add more spins.</p>
-    <p>Long-run return to player is 94.9%, measured over 10 million simulated spins.</p>
+    <p>Six or more Plasma Orbs start Orb Lockdown. The orbs lock in place and you get 3 respins. Every new orb locks too and resets the respins to 3. When the respins run out, every orb pays its prize. Orbs can carry the Minor (25x total bet), Major (100x) or Grand (500x) jackpot, and filling all 15 spaces wins the Jackpot (2,000x).</p>
+    <p>Long-run return to player is 95.2%, measured over 10 million simulated spins.</p>
     <h3>Paylines</h3>
     <div class="lines" id="lineDiagrams"></div>
     <div class="actions"><button class="btn alt" data-close>Close</button></div>
@@ -500,21 +565,56 @@ var SFX = {
   bonus: function () { for (var i = 0; i < 12; i++) tone(300 + i * 90, 0.12, 'square', 0.1, i * 0.05); },
   bleep: function () { tone(1000, 0.32, 'sine', 0.22); },
   blip: function () { tone(1200, 0.04, 'square', 0.05); tone(1500, 0.04, 'square', 0.05, 0.05); },
+  tease: function () { tone(220, 1.0, 'sawtooth', 0.08, 0, 880); },
+  orb: function () { tone(520, 0.15, 'sine', 0.15, 0, 1040); },
+  alarm: function () { for (var i = 0; i < 4; i++) { tone(880, 0.18, 'square', 0.12, i * 0.4); tone(620, 0.18, 'square', 0.12, i * 0.4 + 0.2); } },
+  respin: function () { tone(300, 0.5, 'sawtooth', 0.06, 0, 600); },
+  lockon: function () { tone(160, 0.15, 'square', 0.25, 0, 80); tone(1200, 0.12, 'sine', 0.15); },
   coin: function () { tone(1800, 0.06, 'sine', 0.12); tone(2400, 0.08, 'sine', 0.1, 0.05); }
 };
-// Spooky sci-fi loop: minor bass walk plus a wobbly arpeggio, scheduled ahead of time.
+// Three synthesised music tracks, one per mode, scheduled slightly ahead of time.
 var BASS = [55, 55, 65.4, 55, 49, 49, 58.3, 61.7];
 var ARP = [220, 261.6, 329.6, 392, 329.6, 261.6, 196, 246.9];
+var CHORDS = [[261.6, 329.6, 392, 493.9], [220, 261.6, 329.6, 392], [174.6, 220, 261.6, 329.6], [196, 246.9, 293.7, 392]];
+var TRACKS = {
+  // Garage: spooky minor bass walk and a wobbly arpeggio.
+  base: { bpm: 112, play: function (i, t, d) {
+    if (i % 2 === 0) note(BASS[(i / 2 | 0) % 8], d * 1.8, 'triangle', 0.5, t);
+    note(ARP[i % 8], d * 0.9, 'square', 0.08, t);
+    if (i % 4 === 2) noise(t, 0.12);
+  } },
+  // Rift Run: bright synthwave with a pumping bass, major-seventh arpeggios, kick and hats.
+  free: { bpm: 128, play: function (i, t, d) {
+    var c = CHORDS[(i / 16 | 0) % 4];
+    note(c[0] / (i % 2 ? 2 : 4), d * 0.8, 'sawtooth', 0.16, t);
+    note(c[i % 4] * 2, d * 0.7, 'square', 0.055, t);
+    if (i % 8 === 4) note(c[3] * 2, d * 3, 'triangle', 0.08, t);
+    if (i % 2 === 0) kick(t);
+    noise(t, i % 2 ? 0.1 : 0.05);
+  } },
+  // Orb Lockdown: tense pulsing low note, two-tone alarm every bar, ticking hats.
+  lock: { bpm: 144, play: function (i, t, d) {
+    note(i % 16 < 12 ? 55 : 51.9, d * 0.6, 'sawtooth', 0.22, t);
+    if (i % 16 === 0) { note(880, d * 2, 'square', 0.045, t); note(660, d * 2, 'square', 0.045, t + d * 2); }
+    if (i % 4 === 0) kick(t);
+    noise(t, 0.08);
+  } }
+};
+var musicMode = 'base';
 function scheduleMusic() {
   if (!AC) return;
-  var step = 60 / 112 / 2;
+  var tr = TRACKS[musicMode], d = 60 / tr.bpm / 2;
   while (nextNoteTime < AC.currentTime + 0.3) {
-    var t = nextNoteTime, i = musicStep;
-    if (i % 2 === 0) note(BASS[(i / 2 | 0) % 8], step * 1.8, 'triangle', 0.5, t);
-    note(ARP[i % 8] * (state.free.remaining > 0 ? 1.5 : 1), step * 0.9, 'square', 0.08, t);
-    if (i % 4 === 2) noise(t);
-    nextNoteTime += step; musicStep++;
+    tr.play(musicStep, nextNoteTime, d);
+    nextNoteTime += d; musicStep++;
   }
+}
+function setMusic(mode) { musicMode = mode; musicStep = 0; if (AC) nextNoteTime = Math.max(nextNoteTime, AC.currentTime + 0.05); }
+function kick(t) {
+  var o = AC.createOscillator(), g = AC.createGain();
+  o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(40, t + 0.15);
+  g.gain.setValueAtTime(0.5, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+  o.connect(g); g.connect(musicGain); o.start(t); o.stop(t + 0.2);
 }
 function note(f, d, type, v, t) {
   var o = AC.createOscillator(), g = AC.createGain();
@@ -523,11 +623,11 @@ function note(f, d, type, v, t) {
   o.connect(g); g.connect(musicGain); o.start(t); o.stop(t + d + 0.05);
 }
 var noiseBuf = null;
-function noise(t) {
+function noise(t, vol) {
   if (!noiseBuf) { noiseBuf = AC.createBuffer(1, AC.sampleRate * 0.05, AC.sampleRate); var d = noiseBuf.getChannelData(0); for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
   var src = AC.createBufferSource(), g = AC.createGain(), f = AC.createBiquadFilter();
   f.type = 'highpass'; f.frequency.value = 6000;
-  src.buffer = noiseBuf; g.gain.value = 0.12;
+  src.buffer = noiseBuf; g.gain.value = vol || 0.12;
   src.connect(f); f.connect(g); g.connect(musicGain); src.start(t);
 }
 function startMusic() {
@@ -550,6 +650,8 @@ var QUIPS = {
   collector: [['COLLECTOR', 'Splendid reel. I shall add it to my collection.'], ['COLLECTOR', 'Do not mind me. Just borrowing reality for a moment.'], ['COLLECTOR', 'Ooh, a rare one. Wrap it up, darling.']],
   broke: [['VEX', 'You\'re out of coins, genius. Here\'s a handout. Don\'t make it weird.']],
   level: [['B12', 'Level up. Your parents would be mildly impressed.'], ['VEX', 'New level. Bigger bets. Worse decisions. I love it.']],
+  lockdown: [['FIZZ', 'Containment breach! Everyone remain calm and complete form 9.'], ['VEX', 'The orbs are loose! Grab them before they eat the {damn} house.'], ['DEX', 'Why is it beeping? Uncle Vex, why is it BEEPING?']],
+  jackpot: [['VEX', 'JACKPOT! I\'m buying a new garage. And a better nephew.'], ['DEX', 'Oh {fuck}. Oh {fuck}! We\'re RICH!'], ['GLORP', 'Glorp has never seen so many shinies. Glorp is crying.']],
   freeEnd: [['VEX', 'And we\'re back. Nobody touch the cat. It has too many legs now.'], ['DEX', 'We made it back! I think I left a shoe in that dimension.']]
 };
 var lastQuip = 0;
@@ -581,7 +683,17 @@ function say(kind, force) {
 
 /* ---------- Reels ---------- */
 var reelEls = [], stripEls = [], visible = [];
-function cellHTML(sym, extra) { return '<div class="cell' + (extra ? ' ' + extra : '') + '" data-s="' + sym + '">' + ART[sym] + '</div>'; }
+var curTotalBet = 100, pending = 0;
+function shortFmt(n) { return n >= 1e6 ? (n / 1e6).toFixed(n % 1e6 ? 1 : 0) + 'M' : n >= 1e4 ? Math.round(n / 1e3) + 'K' : n >= 1000 ? (n / 1e3).toFixed(n % 1000 ? 1 : 0) + 'K' : String(n); }
+function valHTML(v, totalBet) {
+  if (v === null || v === undefined) return '';
+  if (typeof v === 'number') return '<span class="val">' + shortFmt(v * totalBet) + '</span>';
+  return '<span class="val ' + v + '">' + v + '</span>';
+}
+function cellHTML(sym, extra, v) {
+  if (sym === 'ORB' && v === undefined) v = E.orbValue();
+  return '<div class="cell' + (extra ? ' ' + extra : '') + '" data-s="' + sym + '">' + ART[sym] + (sym === 'ORB' ? valHTML(v, curTotalBet) : '') + '</div>';
+}
 function buildReels() {
   var host = $('reels'); host.innerHTML = '';
   var start = E.gridFromStops(E.randomStops());
@@ -602,47 +714,59 @@ function sizeReels() {
 window.addEventListener('resize', sizeReels);
 
 var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-function animateReels(grid) {
+function animateReels(grid, orbs) {
   var cell = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell')) || 64;
   var fast = state.settings.fast || reduced;
-  var promises = [];
-  for (var r = 0; r < 5; r++) promises.push(spinReel(r, grid[r], cell, fast));
+  var promises = [], extra = 0, cores = 0, orbCount = 0;
+  for (var r = 0; r < 5; r++) {
+    // Tension: with 2 cores or 4 orbs already showing, the remaining reels spin longer and glow.
+    var tease = r >= 2 && (cores >= 2 || (orbCount >= 4 && r >= 3));
+    if (tease) extra += fast ? 450 : 1100;
+    promises.push(spinReel(r, grid[r], cell, fast, extra, tease, orbs ? orbs.slice(r * 3, r * 3 + 3) : [null, null, null]));
+    grid[r].forEach(function (s) { if (s === 'SCAT') cores++; if (s === 'ORB') orbCount++; });
+  }
   return Promise.all(promises);
 }
-function spinReel(r, finalCol, cell, fast) {
+function spinReel(r, finalCol, cell, fast, extra, tease, vals) {
   return new Promise(function (resolve) {
     var strip = stripEls[r], src = E.STRIPS[r];
-    var filler = (fast ? 6 : 14) + r * (fast ? 2 : 4);
-    var html = finalCol.map(function (s) { return cellHTML(s); }).join('');
+    var dur = (fast ? 380 + r * 110 : 850 + r * 260) + (extra || 0);
+    var filler = Math.round(dur / (fast ? 60 : 55));
+    var finalHTML = finalCol.map(function (s, i) { return cellHTML(s, '', vals[i]); }).join('');
+    var html = finalHTML;
     for (var i = 0; i < filler; i++) html += cellHTML(src[Math.floor(Math.random() * src.length)]);
-    html += visible[r].map(function (s) { return cellHTML(s); }).join('');
+    html += stripEls[r].innerHTML;
+    var done = false;
     strip.style.transition = 'none';
     strip.innerHTML = html;
     var startY = -(filler + 3) * cell;
     strip.style.transform = 'translateY(' + startY + 'px)';
     strip.classList.add('blur');
     void strip.offsetHeight;
-    var dur = fast ? 380 + r * 110 : 850 + r * 260;
+    if (tease) setTimeout(function () { if (!done) { reelEls[r].classList.add('tease'); SFX.tease(); } }, dur - (extra || 0) + 200);
     strip.style.transition = 'transform ' + dur + 'ms cubic-bezier(.18,.72,.32,' + (reduced ? '1' : '1.07') + ')';
     strip.style.transform = 'translateY(0px)';
-    var done = false;
     function finish() {
       if (done) return; done = true;
       strip.classList.remove('blur');
       strip.style.transition = 'none';
-      strip.innerHTML = finalCol.map(function (s) { return cellHTML(s); }).join('');
+      strip.innerHTML = finalHTML;
       strip.style.transform = 'translateY(0px)';
+      reelEls[r].classList.remove('tease');
       visible[r] = finalCol.slice();
       SFX.stop(); vibrate(8);
       if (finalCol.indexOf('SCAT') >= 0) SFX.core();
+      if (finalCol.indexOf('ORB') >= 0) SFX.orb();
       resolve();
     }
     strip.addEventListener('transitionend', finish, { once: true });
-    setTimeout(finish, dur + 120);
+    setTimeout(finish, dur + 150);
   });
 }
 function cellAt(r, row) { return stripEls[r].children[row]; }
+var cycleTimer = null;
 function clearWins() {
+  clearInterval(cycleTimer); cycleTimer = null; $('winLbl').textContent = 'Win';
   $('paylines').innerHTML = '';
   document.querySelectorAll('.cell.win, .cell.dimmed').forEach(function (c) { c.classList.remove('win', 'dimmed'); });
   document.querySelectorAll('.collector').forEach(function (c) { c.remove(); });
@@ -661,6 +785,16 @@ function showWins(res) {
   });
   res.scatterCells.forEach(function (c) { winCells[c[0] + ':' + c[1]] = true; });
   $('paylines').innerHTML = svg;
+  // After a moment, step through each winning line on its own.
+  if (res.wins.length > 1) {
+    var idx = 0;
+    cycleTimer = setInterval(function () {
+      var w = res.wins[idx % res.wins.length], lines = $('paylines').children;
+      for (var k = 0; k < lines.length; k++) lines[k].style.opacity = k === idx % res.wins.length ? '1' : '0.08';
+      $('winLbl').textContent = 'Line ' + (w.line + 1) + ' pays ' + fmt(w.amount);
+      idx++;
+    }, 1100);
+  }
   if (Object.keys(winCells).length) {
     for (var r = 0; r < 5; r++) for (var row = 0; row < 3; row++) {
       var c = cellAt(r, row); if (!c) continue;
@@ -758,7 +892,7 @@ async function doSpin() {
   clearWins(); $('winOut').textContent = '0'; render();
   SFX.spin();
   var res = E.spin({ lineBet: lb, free: free });
-  await animateReels(res.rawGrid);
+  await animateReels(res.rawGrid, free ? null : res.orbs);
   if (res.collectorReel >= 0) await collectorEffect(res.collectorReel);
 
   if (res.total > 0) {
@@ -774,9 +908,12 @@ async function doSpin() {
   } else if (!free) {
     state.stats.losses++;
     var cores = 0; res.rawGrid.forEach(function (c) { c.forEach(function (s) { if (s === 'SCAT') cores++; }); });
-    if (cores === 2 && Math.random() < 0.6) say('near');
+    var orbsShown = res.orbs.filter(function (v) { return v !== null; }).length;
+    if ((cores === 2 || orbsShown === 5) && Math.random() < 0.6) say('near');
     else if (state.stats.losses >= 4 && Math.random() < 0.5) { say('loss'); state.stats.losses = 0; }
   }
+
+  if (res.lockdown) await runLockdown(res, total);
 
   if (res.freeSpins) {
     if (free) {
@@ -789,6 +926,7 @@ async function doSpin() {
       say('bonus', true);
       await bonusIntro(res.freeSpins);
       document.body.classList.add('free', 'dim-' + (1 + Math.floor(Math.random() * 3)));
+      setMusic('free');
     }
   }
   save(); render();
@@ -811,15 +949,16 @@ function bonusSummary() {
     var won = state.free.won, spins = state.free.total;
     state.free = { remaining: 0, lineBet: 0, won: 0, total: 0 };
     document.body.className = '';
+    setMusic('base');
     save(); render();
     say('freeEnd', true);
     message('Back in the garage', '<p style="font-size:17px;color:var(--ink)">Your Rift Run paid <b style="color:var(--goo)">' + fmt(won) + '</b> coins over ' + spins + ' free spins.</p>',
       [{ label: 'Nice', cls: 'go', fn: resolve }], true);
   });
 }
-function bigWin(amount, mult) {
+function bigWin(amount, mult, forcedTitle) {
   return new Promise(function (resolve) {
-    var title = mult >= 50 ? 'Multiverse Win' : mult >= 30 ? 'Mega Win' : 'Big Win';
+    var title = forcedTitle || (mult >= 50 ? 'Multiverse Win' : mult >= 30 ? 'Mega Win' : 'Big Win');
     var el = document.createElement('div'); el.className = 'bigwin';
     el.innerHTML = '<div class="inner"><h2>' + title + '</h2><output>0</output><p>Tap to continue</p></div>';
     for (var i = 0; i < (reduced ? 0 : 36); i++) {
@@ -837,6 +976,100 @@ function bigWin(amount, mult) {
     setTimeout(close, 5000);
   });
 }
+/* ---------- Orb Lockdown ---------- */
+var wait = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+function lockCell(i, v, cls) {
+  var c = $('lockgrid').children[i];
+  c.className = 'lc' + (v !== null ? ' locked' : '') + (cls ? ' ' + cls : '');
+  c.innerHTML = v !== null ? ART.ORB + valHTML(v, curTotalBet) : '';
+}
+async function runLockdown(res, totalBet) {
+  var fast = state.settings.fast || reduced;
+  var L = E.playLockdown(res.orbs);
+  var win = L.totalMultiple * totalBet;
+  // Bank the prize straight away so closing the app mid-round never loses it; the counter catches up at the end.
+  state.coins += win; pending += win; save();
+  state.stats.biggest = Math.max(state.stats.biggest, win);
+  curTotalBet = totalBet;
+  showWins({ wins: [], scatterCells: res.orbs.map(function (v, i) { return v !== null ? [Math.floor(i / 3), i % 3] : null; }).filter(Boolean) });
+  SFX.alarm(); vibrate([100, 60, 100]);
+  say('lockdown', true);
+  await new Promise(function (resolve) {
+    var t = setTimeout(go, 4000);
+    function go() { clearTimeout(t); closeModal('msgModal'); resolve(); }
+    message('Orb Lockdown!', '<p style="font-size:17px;color:var(--ink)">The orbs are locked in. You have 3 respins, and every new orb resets them to 3. Fill all 15 spaces to win the Jackpot.</p>',
+      [{ label: 'Lock it down', cls: 'go', fn: go }], true);
+  });
+  clearWins();
+  document.body.classList.add('lock'); setMusic('lock');
+  var grid = $('lockgrid'); grid.innerHTML = ''; grid.hidden = false;
+  // The grid is laid out reel by reel to match the orb list (index = reel * 3 + row).
+  grid.style.gridAutoFlow = 'column';
+  for (var i = 0; i < 15; i++) { var d = document.createElement('div'); grid.appendChild(d); lockCell(i, res.orbs[i]); }
+  var respins = E.ORB_RESPINS;
+  var banner = function (n) { $('fsBanner').textContent = 'RESPINS · ' + n; };
+  banner(respins);
+  $('spinBtn').textContent = 'LOCK';
+  await wait(fast ? 300 : 700);
+  var cells = res.orbs.slice();
+  for (var s = 0; s < L.steps.length; s++) {
+    var step = L.steps[s];
+    banner(respins);
+    for (var k = 0; k < 15; k++) if (cells[k] === null) grid.children[k].classList.add('roll');
+    SFX.respin();
+    await wait(fast ? 450 : 1000);
+    for (var k2 = 0; k2 < 15; k2++) grid.children[k2].classList.remove('roll');
+    for (var j = 0; j < step.landed.length; j++) {
+      var idx = step.landed[j];
+      cells[idx] = step.cells[idx];
+      lockCell(idx, cells[idx], 'new');
+      SFX.lockon(); vibrate(20);
+      await wait(fast ? 100 : 220);
+    }
+    respins = step.respins;
+    banner(step.landed.length ? respins + ' · RESET!' : respins);
+    await wait(fast ? 250 : 550);
+  }
+  // Collect every orb, reel by reel.
+  $('winOut').textContent = '0';
+  var running = 0;
+  for (var c = 0; c < 15; c++) {
+    var v = cells[c];
+    if (v === null) continue;
+    var amount = E.orbMultiple(v) * totalBet;
+    grid.children[c].classList.add('collect');
+    running += amount;
+    $('winOut').textContent = fmt(running);
+    SFX.coin();
+    if (typeof v === 'string') {
+      $('jp' + v).classList.add('hit');
+      SFX.big(); vibrate([80, 40, 80]);
+      await bigWin(amount, 0, v.charAt(0) + v.slice(1).toLowerCase() + ' Jackpot');
+      $('jp' + v).classList.remove('hit');
+    } else await wait(fast ? 90 : 200);
+    grid.children[c].classList.replace('collect', 'collected');
+  }
+  if (L.full) {
+    var jp = E.JACKPOTS.JACKPOT * totalBet;
+    running += jp; $('winOut').textContent = fmt(running);
+    $('jpJACKPOT').classList.add('hit'); SFX.big(); vibrate([150, 60, 150, 60, 300]);
+    say('jackpot', true);
+    await bigWin(jp, 0, 'JACKPOT!');
+    $('jpJACKPOT').classList.remove('hit');
+  }
+  pending -= win; render();
+  if (win >= 15 * totalBet && !L.full && !state.settings.skip) { SFX.big(); await bigWin(win, win / totalBet); }
+  if (win >= 15 * totalBet) say(L.full ? 'jackpot' : 'big', true);
+  await new Promise(function (resolve) {
+    message('Lockdown over', '<p style="font-size:17px;color:var(--ink)">' + L.cells.filter(function (x) { return x !== null; }).length + ' orbs paid <b style="color:var(--goo)">' + fmt(win) + '</b> coins.</p>',
+      [{ label: 'Collect', cls: 'go', fn: resolve }], true);
+  });
+  grid.hidden = true; grid.innerHTML = '';
+  document.body.classList.remove('lock');
+  setMusic(state.free.remaining > 0 || res.freeSpins ? 'free' : 'base');
+  render();
+}
+
 function countUp(el, to, ms) {
   ms = ms || Math.min(1200, 300 + to / 20);
   var start = performance.now();
@@ -851,14 +1084,16 @@ function stopAuto() { auto = false; $('autoBtn').setAttribute('aria-pressed', 'f
 
 /* ---------- UI ---------- */
 function render() {
-  $('coinOut').textContent = fmt(state.coins);
+  $('coinOut').textContent = fmt(state.coins - pending);
   $('lvlOut').textContent = 'Level ' + state.level;
   $('xpBar').style.width = Math.min(100, state.xp / xpNeeded(state.level) * 100) + '%';
   var free = state.free.remaining > 0 || document.body.classList.contains('free');
   var lb = free && state.free.lineBet ? state.free.lineBet : lineBet();
   $('lineBetOut').textContent = lb;
+  if (!document.body.classList.contains('lock')) curTotalBet = lb * 20;
+  ['MINOR', 'MAJOR', 'GRAND', 'JACKPOT'].forEach(function (k) { $('jp' + k).querySelector('b').textContent = shortFmt(E.JACKPOTS[k] * curTotalBet); });
   $('totalBetOut').textContent = fmt(lb * 20);
-  $('fsBanner').textContent = 'RIFT RUN · ' + state.free.remaining + ' LEFT';
+  if (!document.body.classList.contains('lock')) $('fsBanner').textContent = 'RIFT RUN · ' + state.free.remaining + ' LEFT';
   $('spinBtn').textContent = state.free.remaining > 0 ? 'FREE' : 'SPIN';
   setButtons();
   renderTimers();
@@ -939,6 +1174,7 @@ function renderPaytable() {
   }).join('');
   var tb = lb * 20;
   html += '<div class="pt" style="grid-column:1/-1"><div class="ic">' + ART.SCAT + '</div><dl><span class="nm">Quantum Core, anywhere</span><dt>5</dt><dd>' + fmt(50 * tb) + ' + 25 spins</dd><dt>4</dt><dd>' + fmt(10 * tb) + ' + 15 spins</dd><dt>3</dt><dd>' + fmt(2 * tb) + ' + 10 spins</dd></dl></div>';
+  html += '<div class="pt" style="grid-column:1/-1"><div class="ic">' + ART.ORB + '</div><dl><span class="nm">Plasma Orb: 6 or more start Orb Lockdown</span><dt>Minor</dt><dd>' + fmt(E.JACKPOTS.MINOR * tb) + '</dd><dt>Major</dt><dd>' + fmt(E.JACKPOTS.MAJOR * tb) + '</dd><dt>Grand</dt><dd>' + fmt(E.JACKPOTS.GRAND * tb) + '</dd><dt>Jackpot</dt><dd>' + fmt(E.JACKPOTS.JACKPOT * tb) + '</dd></dl></div>';
   $('paytable').innerHTML = html;
   $('lineDiagrams').innerHTML = E.LINES.map(function (line, i) {
     var cells = '';
@@ -1008,9 +1244,12 @@ $('topupBtn').addEventListener('click', function () { audio(); if (Date.now() >=
 $('dailyBtn').addEventListener('click', function () { audio(); SFX.click(); showDaily(); });
 
 /* ---------- Boot ---------- */
+$('scene').children[0].innerHTML = window.RiftScenes.garage;
+$('scene').children[1].innerHTML = window.RiftScenes.rift;
+$('scene').children[2].innerHTML = window.RiftScenes.lock;
 load();
 // A free-spin run interrupted by closing the app resumes on the next spin press.
-if (state.free.remaining > 0) document.body.classList.add('free', 'dim-1');
+if (state.free.remaining > 0) { document.body.classList.add('free', 'dim-1'); musicMode = 'free'; }
 buildReels();
 render();
 say('hello', true);

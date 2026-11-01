@@ -15,8 +15,8 @@ A Vegas-style 5-reel slot machine game for Android with an original mad-scientis
 node tools/simulate.js 10000000
 ```
 
-Current result: 94.85% return to player, a win about 1 spin in 2.7, the free-spins bonus about 1 in 125 spins.
+Current result: 95.2% return to player (normal spins 50.9%, free spins 20.4%, Orb Lockdown 24.0%). A win about 1 spin in 3.2, free spins about 1 in 148 spins, Orb Lockdown about 1 in 147.
 
 ## Status
 
-Prototype 0.1 (step 2 of 4). Art polish, sound polish and Android packaging with Capacitor come next.
+Prototype 0.2 (step 3 of 4): Orb Lockdown hold-and-spin with Minor, Major, Grand and Jackpot prizes, plus separate looks and music for the garage, free spins and Lockdown. Android packaging with Capacitor comes next.
