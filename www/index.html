@@ -482,6 +482,33 @@ select { background: var(--panel); color: var(--ink); border: 2px solid var(--li
   .controls .bet { grid-area: bet; justify-self: center; }
   .controls .side { grid-area: side; justify-self: center; }
 }
+/* Landscape preview (Settings > Test features): turns the whole game sideways on a portrait screen */
+html.force-land body { position: absolute; top: 0; left: 0; width: 100vh; height: 100vw; transform-origin: top left; transform: rotate(90deg) translateY(-100%); }
+html.force-land .rotate-hint { display: none !important; }
+  html.force-land .app { max-width: none; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto minmax(0, 1fr); gap: 8px 10px; padding-block: 6px; padding-left: max(10px, env(safe-area-inset-left, 0px)); padding-right: max(10px, env(safe-area-inset-right, 0px)); }
+  html.force-land .topbar { grid-column: 1; grid-row: 1; }
+  html.force-land .coins { max-width: 260px; }
+  html.force-land .bottom { grid-column: 2; grid-row: 1; align-self: center; }
+  html.force-land .bottom button { flex: none; padding: 6px 12px; font-size: 12px; }
+  html.force-land .cabinet { grid-column: 1 / -1; grid-row: 2; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr); grid-template-areas: "mq reels meter" "jp reels ctrl" "quip reels ctrl"; align-items: center; justify-items: stretch; gap: 8px 14px; padding: 10px 14px; }
+  html.force-land .marquee { grid-area: mq; padding: 4px 6px; gap: 4px; }
+  html.force-land .marquee::after { width: 140px; height: 140px; margin: -70px 0 0 -70px; }
+  html.force-land .logo img { height: min(96px, 22vw); margin: -6px auto -8px; }
+  html.force-land .mascot { width: min(34px, 8vw); }
+  html.force-land .fs-banner { font-size: 11px; padding: 2px 8px; white-space: nowrap; }
+  html.force-land .jackpots { grid-area: jp; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  html.force-land .quip { grid-area: quip; align-self: start; min-height: 0; }
+  html.force-land .quip .face { width: 34px; height: 34px; }
+  html.force-land .bubble { font-size: 12px; padding: 5px 9px; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; line-height: 1.3; max-height: calc(3.9em + 10px); box-sizing: border-box; }
+  html.force-land .reelwrap { grid-area: reels; width: min(calc((100vw - 92px) * 1.62), 50vh); align-self: center; }
+  html.force-land .meter { grid-area: meter; flex-direction: column; gap: 6px; }
+  html.force-land .controls { grid-area: ctrl; grid-template-columns: 1fr; grid-template-areas: "spin" "bet" "side"; justify-items: center; gap: 12px 8px; align-self: center; }
+  html.force-land .controls .pill { padding-block: 6px; }
+  html.force-land .controls .spin { grid-area: spin; width: min(88px, 21vw); height: min(88px, 21vw); font-size: 17px; }
+  html.force-land .bet button { width: 32px; height: 32px; }
+  html.force-land .controls .bet { grid-area: bet; justify-self: center; }
+  html.force-land .controls .side { grid-area: side; justify-self: center; }
+
 @media (prefers-reduced-motion: reduce) {
   .swirl, .bob, .alarm, .lc.roll::after,
   .marquee::before, .cell.win svg, .bottom button.ready { animation: none; }
@@ -594,6 +621,7 @@ select { background: var(--panel); color: var(--ink); border: 2px solid var(--li
       <button class="btn alt" data-force="lock">Lockdown</button>
       <button class="btn alt" data-force="big">Big win</button>
     </div>
+    <div class="actions"><button class="btn alt" id="landBtn" aria-pressed="false">Preview landscape</button></div>
     <h3>About</h3>
     <p class="note">Rift Riches is for players aged 18 and over. Coins have no cash value and can never be withdrawn or exchanged for prizes. Prototype 0.2, test mode: purchases are free.</p>
     <div class="actions">
@@ -1456,6 +1484,11 @@ $('autoBtn').addEventListener('click', function () {
   if (auto && !spinning && state.free.remaining === 0) doSpin();
 });
 // Landscape: ask the phone to lock sideways on the first tap (works in Chrome on Android and in the app), and hint otherwise.
+$('landBtn').addEventListener('click', function () {
+  var on = document.documentElement.classList.toggle('force-land');
+  this.setAttribute('aria-pressed', on); this.textContent = on ? 'Back to portrait' : 'Preview landscape';
+  closeModal('settingsModal'); setTimeout(sizeReels, 50);
+});
 $('rotateHint').addEventListener('click', function () { document.body.classList.add('hint-off'); });
 setTimeout(function () { document.body.classList.add('hint-off'); }, 8000);
 document.addEventListener('pointerdown', function lockLandscape() {
