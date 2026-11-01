@@ -189,6 +189,9 @@ body.free .reelwrap { box-shadow: 0 0 0 3px #000, 0 0 30px #ff3d9aaa; }
 .bet { display: flex; align-items: center; gap: 6px; justify-self: start; }
 .bet button { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--line); background: var(--panel-2); font-family: var(--display); font-size: 18px; }
 .bet button:disabled { opacity: .35; cursor: default; }
+.bet button.locked { position: relative; color: #ffffff66; }
+.bet button.locked::after { content: ""; position: absolute; right: -4px; top: -4px; width: 14px; height: 14px; border-radius: 50%; background: var(--gold) center / 9px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3'%3E%3Crect x='5' y='11' width='14' height='10' rx='2' fill='%23000'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E"); box-shadow: 0 0 0 1.5px #000; }
+.controls .spin { margin-inline: 12px; }
 .bet .betval { text-align: center; min-width: 56px; }
 .bet .betval b { display: block; font-family: var(--display); font-weight: 400; font-size: 17px; color: var(--gold); font-variant-numeric: tabular-nums; }
 .bet .betval span { font-size: 11px; color: var(--muted); }
@@ -484,7 +487,7 @@ select { background: var(--panel); color: var(--ink); border: 2px solid var(--li
   .meter > div { padding: 1px 6px; }
   .meter label { font-size: 10px; } .meter output { font-size: 16px; }
   .controls { grid-area: ctrl; grid-template-columns: 1fr; grid-template-areas: "spin" "bet" "side"; justify-items: center; align-items: center; gap: 6px; }
-  .controls .spin { grid-area: spin; width: min(80px, 19dvh); height: min(80px, 19dvh); font-size: 16px; }
+  .controls .spin { grid-area: spin; width: min(76px, 18dvh); height: min(76px, 18dvh); font-size: 16px; margin: 0 0 12px; }
   .controls .bet { grid-area: bet; gap: 2px; }
   .controls .bet .betval { min-width: 34px; } .controls .bet .betval span { display: none; }
   .bet button { width: 28px; height: 28px; font-size: 15px; }
@@ -528,7 +531,7 @@ html.force-land .meter > div { padding: 1px 6px; }
 html.force-land .meter label { font-size: 10px; }
 html.force-land .meter output { font-size: 16px; }
 html.force-land .controls { grid-area: ctrl; grid-template-columns: 1fr; grid-template-areas: "spin" "bet" "side"; justify-items: center; align-items: center; gap: 6px; }
-html.force-land .controls .spin { grid-area: spin; width: min(80px, calc(var(--lh) * 19 / 100)); height: min(80px, calc(var(--lh) * 19 / 100)); font-size: 16px; }
+html.force-land .controls .spin { grid-area: spin; width: min(76px, calc(var(--lh) * 18 / 100)); height: min(76px, calc(var(--lh) * 18 / 100)); font-size: 16px; margin: 0 0 12px; }
 html.force-land .controls .bet { grid-area: bet; gap: 2px; }
 html.force-land .controls .bet .betval { min-width: 34px; }
 html.force-land .controls .bet .betval span { display: none; }
@@ -538,6 +541,8 @@ html.force-land .controls .pill { padding: 4px 12px; font-size: 12px; }
 html.force-land .bottom { grid-area: bottom; flex-direction: column; align-self: end; gap: 6px; }
 html.force-land .bottom button { flex: none; padding: 5px 4px; font-size: 11px; }
 /* end landscape preview */
+
+
 
 
 @media (prefers-reduced-motion: reduce) {
@@ -1362,7 +1367,9 @@ function setButtons() {
   var free = state.free.remaining > 0;
   $('spinBtn').disabled = spinning;
   $('betDown').disabled = spinning || free || state.betIdx <= 0;
-  $('betUp').disabled = spinning || free || state.betIdx >= maxBetIdx();
+  var capped = state.betIdx >= maxBetIdx() && maxBetIdx() < E.BET_LEVELS.length - 1;
+  $('betUp').disabled = spinning || free || (state.betIdx >= maxBetIdx() && !capped);
+  $('betUp').classList.toggle('locked', capped);
 }
 function renderTimers() {
   var left = state.nextTopUp - Date.now(), b = $('topupBtn');
@@ -1508,7 +1515,7 @@ setInterval(function () {
 // Wiring
 $('spinBtn').addEventListener('click', doSpin);
 $('betDown').addEventListener('click', function () { SFX.click(); state.betIdx = Math.max(0, Math.min(state.betIdx, maxBetIdx()) - 1); save(); render(); });
-$('betUp').addEventListener('click', function () { SFX.click(); state.betIdx = Math.min(maxBetIdx(), state.betIdx + 1); save(); render(); });
+$('betUp').addEventListener('click', function () { SFX.click(); if (this.classList.contains('locked')) { toast('Bigger bets unlock at level ' + (maxBetIdx() < 3 ? 3 : 6)); return; } state.betIdx = Math.min(maxBetIdx(), state.betIdx + 1); save(); render(); });
 $('autoBtn').addEventListener('click', function () {
   audio(); SFX.click();
   auto = !auto; this.setAttribute('aria-pressed', String(auto));
