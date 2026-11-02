@@ -1296,7 +1296,6 @@ function rollCell(i, v, ms) {
       else { c.innerHTML = ''; tone(240, 0.05, 'triangle', 0.08); }
       done();
     }
-    if (reduced) { setTimeout(land, ms); return; }
     var h = c.clientHeight, n = 8 + Math.round(ms / 85), html = '';
     for (var q = 0; q < n - 1; q++) {
       var orb = Math.random() < 0.55;
@@ -1313,7 +1312,7 @@ function rollCell(i, v, ms) {
   });
 }
 async function runLockdown(res, totalBet) {
-  var fast = state.settings.fast || reduced;
+  var fast = state.settings.fast; // the respins are the point of the feature, so they always spin
   var L = E.playLockdown(res.orbs);
   var win = L.totalMultiple * totalBet;
   // Bank the prize straight away so closing the app mid-round never loses it; the counter catches up at the end.
