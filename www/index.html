@@ -271,6 +271,11 @@ body.lock .spin { background: radial-gradient(circle at 40% 30%, #ffe9a8, var(--
 @keyframes slam { from { transform: scale(2.2); opacity: 0; } }
 .lc.collect { border-color: var(--gold); box-shadow: inset 0 0 18px var(--gold), 0 0 12px var(--gold); }
 .lc.collected { opacity: .55; }
+.lc .mini { position: absolute; left: 0; right: 0; top: 0; will-change: transform; }
+.lc .mini > div { position: relative; }
+.lc .mini.moving { filter: blur(1.2px) brightness(1.15); }
+.lc.flash { animation: lcflash .5s ease-out; }
+@keyframes lcflash { from { box-shadow: inset 0 0 30px #9fe6ff, 0 0 18px #5fd0ff; } }
 .reel.tease { box-shadow: inset 0 0 0 3px var(--hot), inset 0 0 22px var(--hot); }
 
 
@@ -1283,6 +1288,30 @@ function lockCell(i, v, cls) {
   c.className = 'lc' + (v !== null ? ' locked' : '') + (cls ? ' ' + cls : '');
   c.innerHTML = v !== null ? ART.ORB + valHTML(v, curTotalBet) : '';
 }
+function rollCell(i, v, ms) {
+  return new Promise(function (done) {
+    var c = $('lockgrid').children[i];
+    function land() {
+      if (v !== null) { lockCell(i, v, 'flash'); SFX.lockon(); vibrate(20); }
+      else { c.innerHTML = ''; tone(240, 0.05, 'triangle', 0.08); }
+      done();
+    }
+    if (reduced) { setTimeout(land, ms); return; }
+    var h = c.clientHeight, n = 6 + Math.round(ms / 110), html = '';
+    for (var q = 0; q < n - 1; q++) {
+      var orb = Math.random() < 0.45;
+      html += '<div style="height:' + h + 'px">' + (orb ? ART.ORB + valHTML(E.orbValue(Math.random), curTotalBet) : '') + '</div>';
+    }
+    html += '<div style="height:' + h + 'px">' + (v !== null ? ART.ORB + valHTML(v, curTotalBet) : '') + '</div>';
+    c.innerHTML = '<div class="mini moving">' + html + '</div>';
+    var strip = c.firstChild;
+    strip.getBoundingClientRect();
+    strip.style.transition = 'transform ' + ms + 'ms cubic-bezier(.35,.05,.3,1.06)';
+    strip.style.transform = 'translateY(' + (-(n - 1) * h) + 'px)';
+    setTimeout(function () { strip.classList.remove('moving'); }, ms * 0.8);
+    setTimeout(land, ms + 30);
+  });
+}
 async function runLockdown(res, totalBet) {
   var fast = state.settings.fast || reduced;
   var L = E.playLockdown(res.orbs);
@@ -1315,17 +1344,16 @@ async function runLockdown(res, totalBet) {
   for (var s = 0; s < L.steps.length; s++) {
     var step = L.steps[s];
     banner(respins);
-    for (var k = 0; k < 15; k++) if (cells[k] === null) grid.children[k].classList.add('roll');
+    // Every empty space spins like its own little reel and stops reel by reel, left to right.
     SFX.respin();
-    await wait(fast ? 450 : 1000);
-    for (var k2 = 0; k2 < 15; k2++) grid.children[k2].classList.remove('roll');
-    for (var j = 0; j < step.landed.length; j++) {
-      var idx = step.landed[j];
-      cells[idx] = step.cells[idx];
-      lockCell(idx, cells[idx], 'new');
-      SFX.lockon(); vibrate(20);
-      await wait(fast ? 100 : 220);
+    var rolls = [];
+    for (var k = 0; k < 15; k++) {
+      if (cells[k] !== null) continue;
+      var land = step.landed.indexOf(k) >= 0 ? step.cells[k] : null;
+      rolls.push(rollCell(k, land, (fast ? 350 : 750) + Math.floor(k / 3) * (fast ? 70 : 170) + (k % 3) * (fast ? 15 : 40)));
     }
+    await Promise.all(rolls);
+    for (var j = 0; j < step.landed.length; j++) cells[step.landed[j]] = step.cells[step.landed[j]];
     respins = step.respins;
     banner(step.landed.length ? respins + ' · RESET!' : respins);
     await wait(fast ? 250 : 550);
