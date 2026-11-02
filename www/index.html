@@ -273,7 +273,7 @@ body.lock .spin { background: radial-gradient(circle at 40% 30%, #ffe9a8, var(--
 .lc.collected { opacity: .55; }
 .lc .mini { position: absolute; left: 0; right: 0; top: 0; will-change: transform; }
 .lc .mini > div { position: relative; }
-.lc .mini.moving { filter: blur(1.2px) brightness(1.15); }
+.lc .mini.moving { filter: blur(.6px); }
 .lc.flash { animation: lcflash .5s ease-out; }
 @keyframes lcflash { from { box-shadow: inset 0 0 30px #9fe6ff, 0 0 18px #5fd0ff; } }
 .reel.tease { box-shadow: inset 0 0 0 3px var(--hot), inset 0 0 22px var(--hot); }
@@ -1297,9 +1297,9 @@ function rollCell(i, v, ms) {
       done();
     }
     if (reduced) { setTimeout(land, ms); return; }
-    var h = c.clientHeight, n = 6 + Math.round(ms / 110), html = '';
+    var h = c.clientHeight, n = 8 + Math.round(ms / 85), html = '';
     for (var q = 0; q < n - 1; q++) {
-      var orb = Math.random() < 0.45;
+      var orb = Math.random() < 0.55;
       html += '<div style="height:' + h + 'px">' + (orb ? ART.ORB + valHTML(E.orbValue(Math.random), curTotalBet) : '') + '</div>';
     }
     html += '<div style="height:' + h + 'px">' + (v !== null ? ART.ORB + valHTML(v, curTotalBet) : '') + '</div>';
@@ -1350,7 +1350,7 @@ async function runLockdown(res, totalBet) {
     for (var k = 0; k < 15; k++) {
       if (cells[k] !== null) continue;
       var land = step.landed.indexOf(k) >= 0 ? step.cells[k] : null;
-      rolls.push(rollCell(k, land, (fast ? 350 : 750) + Math.floor(k / 3) * (fast ? 70 : 170) + (k % 3) * (fast ? 15 : 40)));
+      rolls.push(rollCell(k, land, (fast ? 500 : 1100) + Math.floor(k / 3) * (fast ? 90 : 260) + (k % 3) * (fast ? 20 : 60)));
     }
     await Promise.all(rolls);
     for (var j = 0; j < step.landed.length; j++) cells[step.landed[j]] = step.cells[step.landed[j]];
